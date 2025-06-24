@@ -458,24 +458,52 @@ def get_debug_info(image):
         return debug_data
 
 def analyze_skin_type(image):
-    # Enhanced skin type analysis
+    # Enhanced skin type analysis with detailed subtypes
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-    # Multiple analysis methods
+    # Multiple analysis methods for comprehensive detection
     variance = cv2.Laplacian(gray, cv2.CV_64F).var()
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     edges = cv2.Canny(blur, 50, 150)
     edge_density = np.sum(edges > 0) / (edges.shape[0] * edges.shape[1])
     
-    # Enhanced classification
-    if variance > 800 or edge_density > 0.1:
-        return "Oily"  # More texture and shine
+    # Enhanced texture analysis
+    kernel = np.ones((3,3), np.uint8)
+    dilated = cv2.dilate(gray, kernel, iterations=1)
+    eroded = cv2.erode(gray, kernel, iterations=1)
+    texture_variance = np.var(dilated - eroded)
+    
+    # Color analysis for skin type detection
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    saturation = np.mean(hsv[:,:,1])
+    value = np.mean(hsv[:,:,2])
+    
+    # Comprehensive skin type classification with detailed subtypes
+    if variance > 800 or edge_density > 0.1 or texture_variance > 200:
+        if saturation > 50 and value > 150:
+            return "Oily"  # High texture, shine, and saturation
+        else:
+            return "Combination"  # High texture but mixed characteristics
     elif variance < 150 or edge_density < 0.02:
-        return "Dry"   # Less texture, dull
-    elif 200 < variance < 600:
-        return "Normal"
+        if value < 100:
+            return "Dry"   # Low texture, dull appearance
+        else:
+            return "Sensitive"  # Low texture but normal brightness
+    elif 200 < variance < 600 and 0.02 < edge_density < 0.08:
+        if texture_variance < 100:
+            return "Normal"  # Balanced characteristics
+        else:
+            return "Combination"  # Mixed characteristics
     else:
-        return "Combination"
+        # Additional logic for edge cases
+        if saturation > 60:
+            return "Oily"
+        elif saturation < 30:
+            return "Dry"
+        elif texture_variance > 150:
+            return "Combination"
+        else:
+            return "Normal"
 
 def analyze_skin_tone(image):
     mp_face_mesh = mp.solutions.face_mesh
@@ -495,7 +523,9 @@ def analyze_skin_tone(image):
                 landmarks[454],  # Right cheek
                 landmarks[152],  # Chin
                 landmarks[132],  # Left temple
-                landmarks[361]   # Right temple
+                landmarks[361],  # Right temple
+                landmarks[199],  # Left jaw
+                landmarks[419]   # Right jaw
             ]
 
             color_samples = []
@@ -520,26 +550,55 @@ def analyze_skin_tone(image):
             # BGR to RGB conversion
             avg_color = (avg_color_per_channel[2], avg_color_per_channel[1], avg_color_per_channel[0])
 
-            # Improved skin tone classification
+            # Enhanced skin tone classification with detailed subtypes
             red_value = avg_color[0]
+            green_value = avg_color[1]
+            blue_value = avg_color[2]
             
-            if red_value > 180:
+            # Calculate luminance for better skin tone detection
+            luminance = 0.299 * red_value + 0.587 * green_value + 0.114 * blue_value
+            
+            # Enhanced skin tone classification
+            if luminance > 200:
+                skin_tone = "Very Fair"
+            elif luminance > 170:
                 skin_tone = "Fair"
-            elif red_value > 140:
-                skin_tone = "Medium"
+            elif luminance > 140:
+                # Check for olive undertone
+                if abs(red_value - green_value) < 10 and green_value > blue_value:
+                    skin_tone = "Medium (Olive)"
+                else:
+                    skin_tone = "Medium"
+            elif luminance > 110:
+                skin_tone = "Tan"
+            elif luminance > 80:
+                skin_tone = "Deep Tan"
             else:
                 skin_tone = "Deep"
 
-            # Improved undertone classification
-            red_green_diff = avg_color[0] - avg_color[1]
-            red_blue_diff = avg_color[0] - avg_color[2]
+            # Enhanced undertone classification with detailed analysis
+            red_green_diff = red_value - green_value
+            red_blue_diff = red_value - blue_value
+            green_blue_diff = green_value - blue_value
             
-            if red_green_diff > 15 and red_blue_diff > 15:
-                undertone = "Warm"
-            elif red_blue_diff < -10:
-                undertone = "Cool"
+            # Calculate color temperature
+            color_temp = (red_value + green_value) / 2 - blue_value
+            
+            # Enhanced undertone classification
+            if red_green_diff > 15 and red_blue_diff > 15 and color_temp > 20:
+                undertone = "Warm"  # Yellow, peach, or golden
+            elif red_blue_diff < -10 and green_blue_diff < -5:
+                undertone = "Cool"  # Pink, red, or blue
+            elif abs(red_green_diff) < 8 and abs(red_blue_diff) < 8:
+                undertone = "Neutral"  # Balanced mix of both
             else:
-                undertone = "Neutral"
+                # Additional logic for edge cases
+                if color_temp > 15:
+                    undertone = "Warm"
+                elif color_temp < -10:
+                    undertone = "Cool"
+                else:
+                    undertone = "Neutral"
                 
             return skin_tone, undertone
             
@@ -558,7 +617,7 @@ def analyze_face_shape(image):
         h, w, _ = image.shape
 
         try:
-            # More accurate landmark points for face shape analysis
+            # Enhanced landmark points for comprehensive face shape analysis
             forehead = (int(landmarks[10].x * w), int(landmarks[10].y * h))
             chin = (int(landmarks[152].x * w), int(landmarks[152].y * h))
             jaw_left = (int(landmarks[234].x * w), int(landmarks[234].y * h))
@@ -566,30 +625,61 @@ def analyze_face_shape(image):
             cheek_left = (int(landmarks[132].x * w), int(landmarks[132].y * h))
             cheek_right = (int(landmarks[361].x * w), int(landmarks[361].y * h))
             
+            # Additional landmarks for better shape detection
+            temple_left = (int(landmarks[447].x * w), int(landmarks[447].y * h))
+            temple_right = (int(landmarks[227].x * w), int(landmarks[227].y * h))
+            jaw_angle_left = (int(landmarks[199].x * w), int(landmarks[199].y * h))
+            jaw_angle_right = (int(landmarks[419].x * w), int(landmarks[419].y * h))
+            
+            # Calculate comprehensive measurements
             face_width = np.linalg.norm(np.array(jaw_left) - np.array(jaw_right))
             face_height = chin[1] - forehead[1]
             cheek_width = np.linalg.norm(np.array(cheek_left) - np.array(cheek_right))
+            temple_width = np.linalg.norm(np.array(temple_left) - np.array(temple_right))
+            jaw_width = np.linalg.norm(np.array(jaw_angle_left) - np.array(jaw_angle_right))
             
             if face_width <= 0 or face_height <= 0 or cheek_width <= 0:
                 return "Could not determine shape - invalid measurements"
             
+            # Enhanced ratios for better classification
             height_width_ratio = face_height / face_width
             cheek_jaw_ratio = cheek_width / face_width
+            temple_jaw_ratio = temple_width / jaw_width
+            cheek_temple_ratio = cheek_width / temple_width
             
-            # Enhanced face shape classification
-            if 0.9 <= height_width_ratio <= 1.1:
-                if cheek_jaw_ratio > 1.1:
-                    return "Round"
+            # Comprehensive face shape classification with detailed subtypes
+            if 1.3 <= height_width_ratio <= 1.7:
+                if cheek_jaw_ratio > 1.1 and temple_jaw_ratio > 1.05:
+                    return "Oval"  # Balanced proportions
+                elif height_width_ratio > 1.5:
+                    return "Rectangle (Oblong)"  # Long and narrow
                 else:
-                    return "Square"
-            elif height_width_ratio > 1.3:
-                return "Oval"
-            elif height_width_ratio < 0.8:
-                return "Square"
-            elif cheek_jaw_ratio > 1.05:
-                return "Heart"
+                    return "Oval"
+            elif 0.9 <= height_width_ratio <= 1.2:
+                if cheek_jaw_ratio > 1.15 and temple_jaw_ratio > 1.1:
+                    return "Round"  # Wide and circular
+                elif abs(cheek_jaw_ratio - 1.0) < 0.1 and abs(temple_jaw_ratio - 1.0) < 0.1:
+                    return "Square"  # Equal width at all levels
+                else:
+                    return "Round"
+            elif height_width_ratio < 0.9:
+                return "Square"  # Wide and angular
+            elif height_width_ratio > 1.7:
+                return "Rectangle (Oblong)"  # Very long and narrow
+            elif temple_jaw_ratio > 1.2 and cheek_temple_ratio > 1.1:
+                return "Heart"  # Wide forehead, narrow jaw
+            elif cheek_jaw_ratio > 1.2 and temple_jaw_ratio < 0.9:
+                return "Diamond"  # Wide cheekbones, narrow forehead and jaw
+            elif temple_jaw_ratio < 0.8 and cheek_jaw_ratio < 0.9:
+                return "Triangle (Pear)"  # Narrow forehead, wide jaw
             else:
-                return "Oval"  # Default fallback
+                # Additional logic for edge cases
+                if cheek_jaw_ratio > 1.1:
+                    return "Heart"
+                elif temple_jaw_ratio > 1.1:
+                    return "Diamond"
+                else:
+                    return "Oval"  # Default fallback
                 
         except (IndexError, ValueError, ZeroDivisionError) as e:
             print(f"Error in face shape analysis: {e}")
@@ -606,21 +696,26 @@ def analyze_eye_shape(image):
         h, w, _ = image.shape
 
         try:
-            # Eye shape analysis using key landmarks
+            # Enhanced eye shape analysis using comprehensive landmarks
+            # Left eye landmarks
             left_eye_outer = (int(landmarks[33].x * w), int(landmarks[33].y * h))
             left_eye_inner = (int(landmarks[133].x * w), int(landmarks[133].y * h))
             left_eye_top = (int(landmarks[159].x * w), int(landmarks[159].y * h))
             left_eye_bottom = (int(landmarks[145].x * w), int(landmarks[145].y * h))
+            left_eye_upper_lid = (int(landmarks[158].x * w), int(landmarks[158].y * h))
+            left_eye_lower_lid = (int(landmarks[144].x * w), int(landmarks[144].y * h))
             
+            # Right eye landmarks
             right_eye_outer = (int(landmarks[362].x * w), int(landmarks[362].y * h))
             right_eye_inner = (int(landmarks[263].x * w), int(landmarks[263].y * h))
             right_eye_top = (int(landmarks[386].x * w), int(landmarks[386].y * h))
             right_eye_bottom = (int(landmarks[374].x * w), int(landmarks[374].y * h))
+            right_eye_upper_lid = (int(landmarks[385].x * w), int(landmarks[385].y * h))
+            right_eye_lower_lid = (int(landmarks[373].x * w), int(landmarks[373].y * h))
             
-            # Calculate eye dimensions
+            # Calculate comprehensive eye measurements
             left_eye_width = np.linalg.norm(np.array(left_eye_outer) - np.array(left_eye_inner))
             left_eye_height = np.linalg.norm(np.array(left_eye_top) - np.array(left_eye_bottom))
-            
             right_eye_width = np.linalg.norm(np.array(right_eye_outer) - np.array(right_eye_inner))
             right_eye_height = np.linalg.norm(np.array(right_eye_top) - np.array(right_eye_bottom))
             
@@ -631,15 +726,74 @@ def analyze_eye_shape(image):
             if avg_eye_width <= 0 or avg_eye_height <= 0:
                 return "Unknown"
             
+            # Calculate eye ratios and characteristics
             eye_ratio = avg_eye_height / avg_eye_width
             
-            # Eye shape classification
-            if eye_ratio > 0.4:
-                return "Round"
+            # Eye spacing analysis
+            eye_spacing = np.linalg.norm(np.array(left_eye_inner) - np.array(right_eye_inner))
+            eye_spacing_ratio = eye_spacing / avg_eye_width
+            
+            # Eye depth analysis (distance from eye to brow)
+            left_brow = (int(landmarks[70].x * w), int(landmarks[70].y * h))
+            right_brow = (int(landmarks[300].x * w), int(landmarks[300].y * h))
+            left_eye_depth = abs(left_eye_top[1] - left_brow[1])
+            right_eye_depth = abs(right_eye_top[1] - right_brow[1])
+            avg_eye_depth = (left_eye_depth + right_eye_depth) / 2
+            
+            # Eye angle analysis (upturned/downturned)
+            left_eye_angle = np.arctan2(left_eye_outer[1] - left_eye_inner[1], 
+                                      left_eye_outer[0] - left_eye_inner[0])
+            right_eye_angle = np.arctan2(right_eye_inner[1] - right_eye_outer[1], 
+                                       right_eye_inner[0] - right_eye_outer[0])
+            avg_eye_angle = (left_eye_angle + right_eye_angle) / 2
+            
+            # Comprehensive eye shape classification with detailed subtypes
+            # First, determine basic shape
+            if eye_ratio > 0.45:
+                base_shape = "Round"
             elif eye_ratio < 0.25:
-                return "Almond"
+                base_shape = "Almond"
             else:
-                return "Almond"  # Default to almond for most cases
+                base_shape = "Almond"
+            
+            # Determine additional characteristics
+            characteristics = []
+            
+            # Eye spacing
+            if eye_spacing_ratio < 1.5:
+                characteristics.append("Close-set")
+            elif eye_spacing_ratio > 2.5:
+                characteristics.append("Wide-set")
+            
+            # Eye depth
+            if avg_eye_depth > avg_eye_height * 0.8:
+                characteristics.append("Deep-set")
+            elif avg_eye_depth < avg_eye_height * 0.3:
+                characteristics.append("Protruding")
+            
+            # Eye angle (upturned/downturned)
+            if avg_eye_angle > 0.3:  # Positive angle indicates upturned
+                characteristics.append("Upturned")
+            elif avg_eye_angle < -0.3:  # Negative angle indicates downturned
+                characteristics.append("Downturned")
+            
+            # Hooded eyes detection (upper lid covers more of the eye)
+            left_hood_ratio = left_eye_upper_lid[1] / left_eye_height
+            right_hood_ratio = right_eye_upper_lid[1] / right_eye_height
+            avg_hood_ratio = (left_hood_ratio + right_hood_ratio) / 2
+            
+            if avg_hood_ratio > 0.6:
+                characteristics.append("Hooded")
+            
+            # Monolid detection (minimal crease)
+            if avg_eye_height < avg_eye_width * 0.2:
+                characteristics.append("Monolid")
+            
+            # Combine characteristics
+            if characteristics:
+                return f"{base_shape} ({', '.join(characteristics)})"
+            else:
+                return base_shape
                 
         except (IndexError, ValueError, ZeroDivisionError) as e:
             print(f"Error in eye shape analysis: {e}")
@@ -656,12 +810,13 @@ def analyze_lip_shape(image):
         h, w, _ = image.shape
 
         try:
-            # Enhanced lip shape analysis using more accurate MediaPipe landmarks
+            # Enhanced lip shape analysis using comprehensive MediaPipe landmarks
             # Upper lip landmarks (more precise)
             upper_lip_center = (int(landmarks[13].x * w), int(landmarks[13].y * h))      # Philtrum
             upper_lip_left = (int(landmarks[78].x * w), int(landmarks[78].y * h))        # Left corner upper
             upper_lip_right = (int(landmarks[308].x * w), int(landmarks[308].y * h))     # Right corner upper
             upper_lip_top = (int(landmarks[12].x * w), int(landmarks[12].y * h))         # Upper lip top
+            upper_lip_cupid = (int(landmarks[14].x * w), int(landmarks[14].y * h))       # Cupid's bow
             
             # Lower lip landmarks (more precise)
             lower_lip_center = (int(landmarks[14].x * w), int(landmarks[14].y * h))      # Lower lip center
@@ -669,7 +824,13 @@ def analyze_lip_shape(image):
             lower_lip_right = (int(landmarks[314].x * w), int(landmarks[314].y * h))     # Right corner lower
             lower_lip_bottom = (int(landmarks[17].x * w), int(landmarks[17].y * h))      # Lower lip bottom
             
-            # Calculate lip dimensions
+            # Additional landmarks for detailed analysis
+            upper_lip_mid_left = (int(landmarks[81].x * w), int(landmarks[81].y * h))
+            upper_lip_mid_right = (int(landmarks[311].x * w), int(landmarks[311].y * h))
+            lower_lip_mid_left = (int(landmarks[87].x * w), int(landmarks[87].y * h))
+            lower_lip_mid_right = (int(landmarks[317].x * w), int(landmarks[317].y * h))
+            
+            # Calculate comprehensive lip dimensions
             lip_width = np.linalg.norm(np.array(upper_lip_left) - np.array(upper_lip_right))
             lip_height = np.linalg.norm(np.array(upper_lip_top) - np.array(lower_lip_bottom))
             
@@ -682,16 +843,56 @@ def analyze_lip_shape(image):
             if lip_width <= 0 or lip_height <= 0:
                 return "Unknown"
             
+            # Calculate detailed ratios and characteristics
             lip_ratio = lip_height / lip_width
             total_lip_height = upper_lip_height + lower_lip_height
+            upper_lower_ratio = upper_lip_height / lower_lip_height if lower_lip_height > 0 else 1
             
-            # Enhanced lip shape classification with better thresholds
-            if lip_ratio > 0.4 or total_lip_height > lip_width * 0.45:
-                return "Full"
-            elif lip_ratio < 0.25 or total_lip_height < lip_width * 0.2:
-                return "Thin"
+            # Cupid's bow analysis for heart-shaped detection
+            cupid_height = abs(upper_lip_cupid[1] - upper_lip_center[1])
+            cupid_ratio = cupid_height / upper_lip_height if upper_lip_height > 0 else 0
+            
+            # Lip fullness analysis
+            fullness_ratio = total_lip_height / lip_width
+            
+            # Comprehensive lip shape classification with detailed subtypes
+            characteristics = []
+            
+            # Basic fullness classification
+            if fullness_ratio > 0.45 or lip_ratio > 0.4:
+                base_shape = "Full"
+            elif fullness_ratio < 0.2 or lip_ratio < 0.25:
+                base_shape = "Thin"
             else:
-                return "Medium"
+                base_shape = "Medium"
+            
+            # Top-heavy vs Bottom-heavy analysis
+            if upper_lower_ratio > 1.3:
+                characteristics.append("Top-heavy")
+            elif upper_lower_ratio < 0.7:
+                characteristics.append("Bottom-heavy")
+            
+            # Heart-shaped detection (prominent cupid's bow)
+            if cupid_ratio > 0.4 and upper_lower_ratio > 1.1:
+                characteristics.append("Heart-shaped")
+            
+            # Round vs Wide analysis
+            if lip_ratio > 0.5:
+                characteristics.append("Round")
+            elif lip_width > face_width * 0.4:  # Compare to face width
+                characteristics.append("Wide")
+            
+            # Additional shape characteristics
+            if lip_ratio < 0.2:
+                characteristics.append("Thin")
+            elif fullness_ratio > 0.6:
+                characteristics.append("Full")
+            
+            # Combine characteristics
+            if characteristics:
+                return f"{base_shape} ({', '.join(characteristics)})"
+            else:
+                return base_shape
                 
         except (IndexError, ValueError, ZeroDivisionError) as e:
             print(f"Error in lip shape analysis: {e}")
@@ -708,10 +909,11 @@ def analyze_nose_shape(image):
         h, w, _ = image.shape
 
         try:
-            # Enhanced nose shape analysis using more accurate MediaPipe landmarks
+            # Enhanced nose shape analysis using comprehensive MediaPipe landmarks
             # Nose bridge and tip landmarks
             nose_bridge_top = (int(landmarks[168].x * w), int(landmarks[168].y * h))     # Nose bridge top
             nose_bridge_mid = (int(landmarks[6].x * w), int(landmarks[6].y * h))         # Nose bridge middle
+            nose_bridge_lower = (int(landmarks[197].x * w), int(landmarks[197].y * h))   # Nose bridge lower
             nose_tip = (int(landmarks[4].x * w), int(landmarks[4].y * h))                # Nose tip
             nose_bottom = (int(landmarks[2].x * w), int(landmarks[2].y * h))             # Nose bottom
             
@@ -723,29 +925,101 @@ def analyze_nose_shape(image):
             nose_base_left = (int(landmarks[131].x * w), int(landmarks[131].y * h))      # Left nose base
             nose_base_right = (int(landmarks[360].x * w), int(landmarks[360].y * h))     # Right nose base
             
-            # Calculate nose dimensions
+            # Additional landmarks for detailed analysis
+            nose_bridge_left = (int(landmarks[5].x * w), int(landmarks[5].y * h))
+            nose_bridge_right = (int(landmarks[195].x * w), int(landmarks[195].y * h))
+            nose_tip_left = (int(landmarks[125].x * w), int(landmarks[125].y * h))
+            nose_tip_right = (int(landmarks[356].x * w), int(landmarks[356].y * h))
+            
+            # Calculate comprehensive nose dimensions
             nose_length = np.linalg.norm(np.array(nose_bridge_top) - np.array(nose_bottom))
             nose_width = np.linalg.norm(np.array(nose_left) - np.array(nose_right))
             nose_base_width = np.linalg.norm(np.array(nose_base_left) - np.array(nose_base_right))
-            
-            # Additional measurements
-            bridge_width = np.linalg.norm(np.array(nose_bridge_mid) - np.array(nose_bridge_top))
+            bridge_width = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_bridge_right))
+            tip_width = np.linalg.norm(np.array(nose_tip_left) - np.array(nose_tip_right))
             
             if nose_length <= 0 or nose_width <= 0:
                 return "Unknown"
             
+            # Calculate detailed ratios and characteristics
             nose_ratio = nose_length / nose_width
             base_ratio = nose_base_width / nose_width
+            bridge_tip_ratio = bridge_width / tip_width if tip_width > 0 else 1
             
-            # Enhanced nose shape classification with better thresholds
-            if nose_ratio > 4.0:
-                return "Long"
+            # Bridge straightness analysis
+            bridge_points = [
+                np.array(nose_bridge_top),
+                np.array(nose_bridge_mid),
+                np.array(nose_bridge_lower),
+                np.array(nose_tip)
+            ]
+            
+            # Calculate bridge curvature
+            bridge_curvature = 0
+            for i in range(1, len(bridge_points) - 1):
+                v1 = bridge_points[i] - bridge_points[i-1]
+                v2 = bridge_points[i+1] - bridge_points[i]
+                angle = np.arccos(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
+                bridge_curvature += angle
+            
+            # Tip angle analysis (upturned/downturned)
+            tip_angle = np.arctan2(nose_tip[1] - nose_bridge_lower[1], 
+                                 nose_tip[0] - nose_bridge_lower[0])
+            
+            # Comprehensive nose shape classification with detailed subtypes
+            characteristics = []
+            
+            # Basic size classification
+            if nose_ratio > 4.5:
+                base_shape = "Long"
             elif nose_ratio < 2.5 or base_ratio > 1.8:
-                return "Wide"
-            elif 2.5 <= nose_ratio <= 4.0:
-                return "Medium"
+                base_shape = "Wide"
+            elif 2.5 <= nose_ratio <= 4.5:
+                base_shape = "Medium"
             else:
-                return "Medium"  # Default fallback
+                base_shape = "Medium"
+            
+            # Bridge shape analysis
+            if bridge_curvature < 0.1:  # Very straight bridge
+                characteristics.append("Greek (straight)")
+            elif bridge_curvature > 0.5:  # Curved bridge
+                characteristics.append("Roman (aquiline)")
+            
+            # Tip characteristics
+            if tip_angle > 0.3:  # Positive angle indicates upturned
+                characteristics.append("Turned-up")
+            elif tip_angle < -0.3:  # Negative angle indicates downturned
+                characteristics.append("Hawk")
+            
+            # Width characteristics
+            if base_ratio > 1.5:
+                characteristics.append("Nubian")
+            elif bridge_tip_ratio < 0.7:
+                characteristics.append("Button")
+            
+            # Bridge characteristics
+            if bridge_width < nose_width * 0.3:
+                characteristics.append("Flat")
+            elif bridge_width > nose_width * 0.6:
+                characteristics.append("Fleshy")
+            
+            # Crooked detection (asymmetry)
+            left_side = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_tip_left))
+            right_side = np.linalg.norm(np.array(nose_bridge_right) - np.array(nose_tip_right))
+            asymmetry = abs(left_side - right_side) / max(left_side, right_side)
+            
+            if asymmetry > 0.2:
+                characteristics.append("Crooked")
+            
+            # Snub nose detection (short and upturned)
+            if nose_ratio < 3.0 and tip_angle > 0.2:
+                characteristics.append("Snub")
+            
+            # Combine characteristics
+            if characteristics:
+                return f"{base_shape} ({', '.join(characteristics)})"
+            else:
+                return base_shape
                 
         except (IndexError, ValueError, ZeroDivisionError) as e:
             print(f"Error in nose shape analysis: {e}")

@@ -112,5 +112,42 @@ Desktop.ini
 # Node modules (if any frontend JS dependencies)
 node_modules/
 
-# Custom: ignore products.json if it's generated, otherwise remove this line
-# products.json
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+
+# Large image files
+*.psd
+*.ai
+*.eps
+*.tiff
+*.tif
+
+# Large data files
+*.csv
+*.xlsx
+*.xls
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
