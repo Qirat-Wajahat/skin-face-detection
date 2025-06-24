@@ -109,6 +109,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
             overlay.style.opacity = "1";
             overlay.style.transform = "scale(1)";
           }
+
+          // Apply horizontal flip to video display to fix mirror effect
+          video.style.transform = "scaleX(-1)";
         });
 
         if (videoDevices.length === 0) {
@@ -149,10 +152,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
     showLoading();
 
     try {
-      // Capture frame
+      // Capture frame with horizontal flip to fix mirror effect
       const context = canvas.getContext("2d");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+
+      // Apply horizontal flip transformation to fix mirror effect
+      context.scale(-1, 1);
+      context.translate(-canvas.width, 0);
       context.drawImage(video, 0, 0);
 
       // Convert to blob
@@ -236,9 +243,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
     showLoading();
 
     try {
+      // Capture frame with horizontal flip to fix mirror effect
       const context = canvas.getContext("2d");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+
+      // Apply horizontal flip transformation to fix mirror effect
+      context.scale(-1, 1);
+      context.translate(-canvas.width, 0);
       context.drawImage(video, 0, 0);
 
       const blob = await new Promise((resolve) =>
@@ -441,9 +453,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 <p class="product-type">${product.type || "Makeup"}</p>
                 <p class="product-price">${product.price}</p>
                 <p class="product-brand">${product.brand}</p>
-                <a href="${
-                  product.link
-                }" class="product-link" target="_blank">View Product</a>
             `;
         makeupOutput.appendChild(productCard);
       });
@@ -465,9 +474,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 <p class="product-type">${product.type || "Skincare"}</p>
                 <p class="product-price">${product.price}</p>
                 <p class="product-brand">${product.brand}</p>
-                <a href="${
-                  product.link
-                }" class="product-link" target="_blank">View Product</a>
             `;
         skincareOutput.appendChild(productCard);
       });
@@ -733,11 +739,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
         <p class="product-type">${product.type || "Product"}</p>
         <p class="product-price">${product.price}</p>
         <p class="product-brand">${product.brand}</p>
-        ${
-          product.link
-            ? `<a href="${product.link}" class="product-link" target="_blank">View Product</a>`
-            : ""
-        }
     `;
     return productCard;
   }
@@ -747,12 +748,135 @@ document.addEventListener("DOMContentLoaded", (event) => {
     resultsDiv.style.opacity = "0";
     resultsDiv.style.transform = "translateY(20px)";
 
-    featuresOutput.innerHTML = `
-        <div class="debug-panel">
-            <h4>Debug Information</h4>
-            <pre>${JSON.stringify(debugData, null, 2)}</pre>
+    // Create a more organized debug display
+    let debugHTML = '<div class="debug-panel">';
+    debugHTML += '<h4><i class="fas fa-bug"></i> Debug Information</h4>';
+
+    // Image info
+    if (debugData.image_size) {
+      debugHTML += `<div class="debug-section">
+        <h5><i class="fas fa-image"></i> Image Information</h5>
+        <p><strong>Size:</strong> ${debugData.image_size}</p>
+        <p><strong>Landmarks Detected:</strong> ${debugData.landmarks_detected}</p>
+      </div>`;
+    }
+
+    // Face shape analysis
+    if (debugData.face_shape_analysis) {
+      const face = debugData.face_shape_analysis;
+      debugHTML += `<div class="debug-section">
+        <h5><i class="fas fa-user"></i> Face Shape Analysis</h5>
+        <div class="debug-grid">
+          <div><strong>Face Width:</strong> ${face.face_width}</div>
+          <div><strong>Face Height:</strong> ${face.face_height}</div>
+          <div><strong>Height/Width Ratio:</strong> ${face.height_width_ratio}</div>
+          <div><strong>Cheek/Jaw Ratio:</strong> ${face.cheek_jaw_ratio}</div>
         </div>
-    `;
+      </div>`;
+    }
+
+    // Skin tone analysis
+    if (debugData.skin_tone_analysis) {
+      const skin = debugData.skin_tone_analysis;
+      debugHTML += `<div class="debug-section">
+        <h5><i class="fas fa-palette"></i> Skin Tone Analysis</h5>
+        <div class="debug-grid">
+          <div><strong>Color Samples:</strong> ${skin.color_samples_count}</div>
+          <div><strong>Average RGB:</strong> [${skin.average_rgb.join(
+            ", "
+          )}]</div>
+          <div><strong>Red Value:</strong> ${skin.red_value}</div>
+          <div><strong>Red-Green Diff:</strong> ${skin.red_green_diff}</div>
+          <div><strong>Red-Blue Diff:</strong> ${skin.red_blue_diff}</div>
+        </div>
+      </div>`;
+    }
+
+    // Eye analysis
+    if (debugData.eye_analysis) {
+      const eye = debugData.eye_analysis;
+      debugHTML += `<div class="debug-section">
+        <h5><i class="fas fa-eye"></i> Eye Analysis</h5>
+        <div class="debug-grid">
+          <div><strong>Left Eye Width:</strong> ${eye.left_eye_width}</div>
+          <div><strong>Left Eye Height:</strong> ${eye.left_eye_height}</div>
+          <div><strong>Right Eye Width:</strong> ${eye.right_eye_width}</div>
+          <div><strong>Right Eye Height:</strong> ${eye.right_eye_height}</div>
+          <div><strong>Average Eye Width:</strong> ${eye.avg_eye_width}</div>
+          <div><strong>Average Eye Height:</strong> ${eye.avg_eye_height}</div>
+          <div><strong>Eye Ratio:</strong> ${eye.eye_ratio}</div>
+        </div>
+      </div>`;
+    }
+
+    // Lip analysis
+    if (debugData.lip_analysis) {
+      const lip = debugData.lip_analysis;
+      debugHTML += `<div class="debug-section">
+        <h5><i class="fas fa-kiss-wink-heart"></i> Lip Analysis</h5>
+        <div class="debug-grid">
+          <div><strong>Lip Width:</strong> ${lip.lip_width}</div>
+          <div><strong>Lip Height:</strong> ${lip.lip_height}</div>
+          <div><strong>Lip Ratio:</strong> ${lip.lip_ratio}</div>
+          <div><strong>Upper Lip Height:</strong> ${lip.upper_lip_height}</div>
+          <div><strong>Lower Lip Height:</strong> ${lip.lower_lip_height}</div>
+          <div><strong>Total Lip Height:</strong> ${lip.total_lip_height}</div>
+          <div><strong>Height/Width Ratio:</strong> ${lip.height_width_ratio}</div>
+        </div>
+      </div>`;
+    }
+
+    // Nose analysis
+    if (debugData.nose_analysis) {
+      const nose = debugData.nose_analysis;
+      if (nose.error) {
+        debugHTML += `<div class="debug-section">
+          <h5><i class="fas fa-smile"></i> Nose Analysis</h5>
+          <p class="debug-error">${nose.error}</p>
+        </div>`;
+      } else {
+        debugHTML += `<div class="debug-section">
+          <h5><i class="fas fa-smile"></i> Nose Analysis</h5>
+          <div class="debug-grid">
+            <div><strong>Nose Length:</strong> ${nose.nose_length}</div>
+            <div><strong>Nose Width:</strong> ${nose.nose_width}</div>
+            <div><strong>Nose Ratio:</strong> ${nose.nose_ratio}</div>
+            <div><strong>Bridge Width:</strong> ${nose.bridge_width}</div>
+            <div><strong>Tip Width:</strong> ${nose.tip_width}</div>
+            <div><strong>Bridge/Tip Ratio:</strong> ${nose.bridge_tip_ratio}</div>
+            <div><strong>Base Ratio:</strong> ${nose.base_ratio}</div>
+            <div><strong>Bridge Curvature:</strong> ${nose.bridge_curvature}</div>
+            <div><strong>Tip Angle:</strong> ${nose.tip_angle}</div>
+            <div><strong>Asymmetry:</strong> ${nose.asymmetry}</div>
+          </div>
+          <div class="debug-subsection">
+            <h6>Landmark Coordinates:</h6>
+            <div class="debug-grid">
+              <div><strong>Bridge Top:</strong> (${nose.measurements.bridge_top[0]}, ${nose.measurements.bridge_top[1]})</div>
+              <div><strong>Bridge Mid:</strong> (${nose.measurements.bridge_mid[0]}, ${nose.measurements.bridge_mid[1]})</div>
+              <div><strong>Bridge Lower:</strong> (${nose.measurements.bridge_lower[0]}, ${nose.measurements.bridge_lower[1]})</div>
+              <div><strong>Nose Tip:</strong> (${nose.measurements.nose_tip[0]}, ${nose.measurements.nose_tip[1]})</div>
+              <div><strong>Nose Bottom:</strong> (${nose.measurements.nose_bottom[0]}, ${nose.measurements.nose_bottom[1]})</div>
+              <div><strong>Nose Left:</strong> (${nose.measurements.nose_left[0]}, ${nose.measurements.nose_left[1]})</div>
+              <div><strong>Nose Right:</strong> (${nose.measurements.nose_right[0]}, ${nose.measurements.nose_right[1]})</div>
+            </div>
+          </div>
+        </div>`;
+      }
+    }
+
+    // Raw data (collapsible)
+    debugHTML += `<div class="debug-section">
+      <h5><i class="fas fa-code"></i> Raw Data</h5>
+      <details>
+        <summary>Click to expand raw JSON data</summary>
+        <pre class="debug-raw">${JSON.stringify(debugData, null, 2)}</pre>
+      </details>
+    </div>`;
+
+    debugHTML += "</div>";
+
+    featuresOutput.innerHTML = debugHTML;
 
     // Switch to features tab
     document

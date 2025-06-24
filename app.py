@@ -135,9 +135,12 @@ def analyze():
                 "needs_contouring": False,
                 "contouring_areas": [],
                 "technique": "Your nose has natural proportions.",
-                "highlight_areas": ["Center of the nose bridge"],
-                "steps": ["Apply light highlight down the center of the nose"],
-                "products": []
+                "highlight_areas": ["Center of the nose bridge", "Tip of the nose"],
+                "steps": ["Apply light highlight down the center of the nose", "Highlight the tip of the nose", "Blend for a subtle glow"],
+                "products": [
+                    {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+                ]
             }
         
         try:
@@ -149,9 +152,12 @@ def analyze():
                 "needs_contouring": False,
                 "contouring_areas": [],
                 "technique": "Your face has natural proportions.",
-                "highlight_areas": ["Center of forehead", "Under eyes"],
-                "steps": ["Apply light highlight to key areas"],
-                "products": []
+                "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
+                "steps": ["Apply contour along the jawline", "Contour under the cheekbones", "Apply contour along the hairline", "Contour under the chin", "Highlight the center of forehead, under eyes, and chin", "Blend thoroughly for a natural look"],
+                "products": [
+                    {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+                ]
             }
 
         print("Beauty analysis completed, getting recommendations...")  # Debug log
@@ -429,6 +435,7 @@ def get_debug_info(image):
             # Nose analysis debug info
             nose_bridge_top = (int(landmarks[168].x * w), int(landmarks[168].y * h))
             nose_bridge_mid = (int(landmarks[6].x * w), int(landmarks[6].y * h))
+            nose_bridge_lower = (int(landmarks[197].x * w), int(landmarks[197].y * h))
             nose_tip = (int(landmarks[4].x * w), int(landmarks[4].y * h))
             nose_bottom = (int(landmarks[2].x * w), int(landmarks[2].y * h))
             
@@ -436,24 +443,78 @@ def get_debug_info(image):
             nose_right = (int(landmarks[358].x * w), int(landmarks[358].y * h))
             nose_base_left = (int(landmarks[131].x * w), int(landmarks[131].y * h))
             nose_base_right = (int(landmarks[360].x * w), int(landmarks[360].y * h))
+            nose_bridge_left = (int(landmarks[5].x * w), int(landmarks[5].y * h))
+            nose_bridge_right = (int(landmarks[195].x * w), int(landmarks[195].y * h))
+            nose_tip_left = (int(landmarks[125].x * w), int(landmarks[125].y * h))
+            nose_tip_right = (int(landmarks[356].x * w), int(landmarks[356].y * h))
             
             nose_length = np.linalg.norm(np.array(nose_bridge_top) - np.array(nose_bottom))
             nose_width = np.linalg.norm(np.array(nose_left) - np.array(nose_right))
             nose_base_width = np.linalg.norm(np.array(nose_base_left) - np.array(nose_base_right))
+            bridge_width = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_bridge_right))
+            tip_width = np.linalg.norm(np.array(nose_tip_left) - np.array(nose_tip_right))
             
-            nose_ratio = nose_length / nose_width if nose_width > 0 else 0
-            base_ratio = nose_base_width / nose_width if nose_width > 0 else 0
+            if nose_length <= 0 or nose_width <= 0:
+                debug_data["nose_analysis"] = {"error": "Invalid nose measurements"}
+            else:
+                # Calculate detailed ratios and characteristics
+                nose_ratio = nose_length / nose_width
+                base_ratio = nose_base_width / nose_width
+                bridge_tip_ratio = bridge_width / tip_width if tip_width > 0 else 1
+                
+                # Bridge straightness analysis
+                bridge_points = [
+                    np.array(nose_bridge_top),
+                    np.array(nose_bridge_mid),
+                    np.array(nose_bridge_lower),
+                    np.array(nose_tip)
+                ]
+                
+                # Calculate bridge curvature
+                bridge_curvature = 0
+                for i in range(1, len(bridge_points) - 1):
+                    v1 = bridge_points[i] - bridge_points[i-1]
+                    v2 = bridge_points[i+1] - bridge_points[i]
+                    if np.linalg.norm(v1) > 0 and np.linalg.norm(v2) > 0:
+                        cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+                        cos_angle = np.clip(cos_angle, -1, 1)  # Prevent domain error
+                        angle = np.arccos(cos_angle)
+                        bridge_curvature += angle
+                
+                # Tip angle analysis (upturned/downturned)
+                tip_angle = np.arctan2(nose_tip[1] - nose_bridge_lower[1], 
+                                     nose_tip[0] - nose_bridge_lower[0])
+                
+                # Asymmetry detection
+                left_side = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_tip_left))
+                right_side = np.linalg.norm(np.array(nose_bridge_right) - np.array(nose_tip_right))
+                asymmetry = abs(left_side - right_side) / max(left_side, right_side) if max(left_side, right_side) > 0 else 0
             
             debug_data["nose_analysis"] = {
                 "nose_length": round(nose_length, 2),
                 "nose_width": round(nose_width, 2),
-                "nose_base_width": round(nose_base_width, 2),
                 "nose_ratio": round(nose_ratio, 3),
-                "base_ratio": round(base_ratio, 3)
-            }
+                    "bridge_width": round(bridge_width, 2),
+                    "tip_width": round(tip_width, 2),
+                    "bridge_tip_ratio": round(bridge_tip_ratio, 3),
+                    "base_ratio": round(base_ratio, 3),
+                    "bridge_curvature": round(bridge_curvature, 3),
+                    "tip_angle": round(tip_angle, 3),
+                    "asymmetry": round(asymmetry, 3),
+                    "measurements": {
+                        "bridge_top": nose_bridge_top,
+                        "bridge_mid": nose_bridge_mid,
+                        "bridge_lower": nose_bridge_lower,
+                        "nose_tip": nose_tip,
+                        "nose_bottom": nose_bottom,
+                        "nose_left": nose_left,
+                        "nose_right": nose_right
+                    }
+                }
             
-        except Exception as e:
-            debug_data["error"] = f"Debug analysis failed: {str(e)}"
+        except (IndexError, ValueError, ZeroDivisionError) as e:
+            print(f"Error in nose shape analysis: {e}")
+            return "Unknown"
         
         return debug_data
 
@@ -550,7 +611,7 @@ def analyze_skin_tone(image):
             # BGR to RGB conversion
             avg_color = (avg_color_per_channel[2], avg_color_per_channel[1], avg_color_per_channel[0])
 
-            # Enhanced skin tone classification with detailed subtypes
+            # Enhanced skin tone classification with corrected thresholds
             red_value = avg_color[0]
             green_value = avg_color[1]
             blue_value = avg_color[2]
@@ -558,25 +619,25 @@ def analyze_skin_tone(image):
             # Calculate luminance for better skin tone detection
             luminance = 0.299 * red_value + 0.587 * green_value + 0.114 * blue_value
             
-            # Enhanced skin tone classification
-            if luminance > 200:
+            # Enhanced skin tone classification with corrected thresholds
+            if luminance > 180:  # Adjusted threshold
                 skin_tone = "Very Fair"
-            elif luminance > 170:
+            elif luminance > 150:  # Adjusted threshold
                 skin_tone = "Fair"
-            elif luminance > 140:
+            elif luminance > 120:  # Adjusted threshold for medium
                 # Check for olive undertone
-                if abs(red_value - green_value) < 10 and green_value > blue_value:
+                if abs(red_value - green_value) < 15 and green_value > blue_value:
                     skin_tone = "Medium (Olive)"
                 else:
                     skin_tone = "Medium"
-            elif luminance > 110:
+            elif luminance > 90:  # Adjusted threshold
                 skin_tone = "Tan"
-            elif luminance > 80:
+            elif luminance > 70:  # Adjusted threshold
                 skin_tone = "Deep Tan"
             else:
                 skin_tone = "Deep"
 
-            # Enhanced undertone classification with detailed analysis
+            # Enhanced undertone classification with corrected analysis
             red_green_diff = red_value - green_value
             red_blue_diff = red_value - blue_value
             green_blue_diff = green_value - blue_value
@@ -584,18 +645,18 @@ def analyze_skin_tone(image):
             # Calculate color temperature
             color_temp = (red_value + green_value) / 2 - blue_value
             
-            # Enhanced undertone classification
-            if red_green_diff > 15 and red_blue_diff > 15 and color_temp > 20:
+            # Enhanced undertone classification with corrected thresholds
+            if red_green_diff > 20 and red_blue_diff > 20 and color_temp > 15:  # Adjusted thresholds
                 undertone = "Warm"  # Yellow, peach, or golden
-            elif red_blue_diff < -10 and green_blue_diff < -5:
+            elif red_blue_diff < -15 and green_blue_diff < -10:  # Adjusted thresholds
                 undertone = "Cool"  # Pink, red, or blue
-            elif abs(red_green_diff) < 8 and abs(red_blue_diff) < 8:
+            elif abs(red_green_diff) < 10 and abs(red_blue_diff) < 10:  # Adjusted thresholds
                 undertone = "Neutral"  # Balanced mix of both
             else:
                 # Additional logic for edge cases
-                if color_temp > 15:
+                if color_temp > 10:  # Adjusted threshold
                     undertone = "Warm"
-                elif color_temp < -10:
+                elif color_temp < -10:  # Adjusted threshold
                     undertone = "Cool"
                 else:
                     undertone = "Neutral"
@@ -647,9 +708,9 @@ def analyze_face_shape(image):
             temple_jaw_ratio = temple_width / jaw_width
             cheek_temple_ratio = cheek_width / temple_width
             
-            # Comprehensive face shape classification with detailed subtypes
-            if 1.3 <= height_width_ratio <= 1.7:
-                if cheek_jaw_ratio > 1.1 and temple_jaw_ratio > 1.05:
+            # Comprehensive face shape classification with corrected thresholds
+            if 1.2 <= height_width_ratio <= 1.6:  # Adjusted range for oval
+                if cheek_jaw_ratio > 1.0 and temple_jaw_ratio > 1.0:
                     return "Oval"  # Balanced proportions
                 elif height_width_ratio > 1.5:
                     return "Rectangle (Oblong)"  # Long and narrow
@@ -664,7 +725,7 @@ def analyze_face_shape(image):
                     return "Round"
             elif height_width_ratio < 0.9:
                 return "Square"  # Wide and angular
-            elif height_width_ratio > 1.7:
+            elif height_width_ratio > 1.6:
                 return "Rectangle (Oblong)"  # Very long and narrow
             elif temple_jaw_ratio > 1.2 and cheek_temple_ratio > 1.1:
                 return "Heart"  # Wide forehead, narrow jaw
@@ -747,14 +808,14 @@ def analyze_eye_shape(image):
                                        right_eye_inner[0] - right_eye_outer[0])
             avg_eye_angle = (left_eye_angle + right_eye_angle) / 2
             
-            # Comprehensive eye shape classification with detailed subtypes
-            # First, determine basic shape
-            if eye_ratio > 0.45:
+            # Comprehensive eye shape classification with corrected thresholds
+            # First, determine basic shape based on corrected ratios
+            if eye_ratio > 0.5:  # Increased threshold for round eyes
                 base_shape = "Round"
-            elif eye_ratio < 0.25:
+            elif eye_ratio < 0.35:  # Adjusted threshold for almond eyes
                 base_shape = "Almond"
             else:
-                base_shape = "Almond"
+                base_shape = "Almond"  # Default to almond for most cases
             
             # Determine additional characteristics
             characteristics = []
@@ -811,30 +872,22 @@ def analyze_lip_shape(image):
 
         try:
             # Enhanced lip shape analysis using comprehensive MediaPipe landmarks
-            # Upper lip landmarks (more precise)
-            upper_lip_center = (int(landmarks[13].x * w), int(landmarks[13].y * h))      # Philtrum
-            upper_lip_left = (int(landmarks[78].x * w), int(landmarks[78].y * h))        # Left corner upper
-            upper_lip_right = (int(landmarks[308].x * w), int(landmarks[308].y * h))     # Right corner upper
-            upper_lip_top = (int(landmarks[12].x * w), int(landmarks[12].y * h))         # Upper lip top
-            upper_lip_cupid = (int(landmarks[14].x * w), int(landmarks[14].y * h))       # Cupid's bow
-            
-            # Lower lip landmarks (more precise)
-            lower_lip_center = (int(landmarks[14].x * w), int(landmarks[14].y * h))      # Lower lip center
-            lower_lip_left = (int(landmarks[84].x * w), int(landmarks[84].y * h))        # Left corner lower
-            lower_lip_right = (int(landmarks[314].x * w), int(landmarks[314].y * h))     # Right corner lower
-            lower_lip_bottom = (int(landmarks[17].x * w), int(landmarks[17].y * h))      # Lower lip bottom
-            
-            # Additional landmarks for detailed analysis
+            upper_lip_center = (int(landmarks[13].x * w), int(landmarks[13].y * h))
+            upper_lip_left = (int(landmarks[78].x * w), int(landmarks[78].y * h))
+            upper_lip_right = (int(landmarks[308].x * w), int(landmarks[308].y * h))
+            upper_lip_top = (int(landmarks[12].x * w), int(landmarks[12].y * h))
+            upper_lip_cupid = (int(landmarks[14].x * w), int(landmarks[14].y * h))
+            lower_lip_center = (int(landmarks[14].x * w), int(landmarks[14].y * h))
+            lower_lip_left = (int(landmarks[84].x * w), int(landmarks[84].y * h))
+            lower_lip_right = (int(landmarks[314].x * w), int(landmarks[314].y * h))
+            lower_lip_bottom = (int(landmarks[17].x * w), int(landmarks[17].y * h))
             upper_lip_mid_left = (int(landmarks[81].x * w), int(landmarks[81].y * h))
             upper_lip_mid_right = (int(landmarks[311].x * w), int(landmarks[311].y * h))
             lower_lip_mid_left = (int(landmarks[87].x * w), int(landmarks[87].y * h))
             lower_lip_mid_right = (int(landmarks[317].x * w), int(landmarks[317].y * h))
-            
-            # Calculate comprehensive lip dimensions
+
             lip_width = np.linalg.norm(np.array(upper_lip_left) - np.array(upper_lip_right))
             lip_height = np.linalg.norm(np.array(upper_lip_top) - np.array(lower_lip_bottom))
-            
-            # Additional measurements for better classification
             upper_lip_midpoint = (np.array(upper_lip_left) + np.array(upper_lip_right)) / 2
             lower_lip_midpoint = (np.array(lower_lip_left) + np.array(lower_lip_right)) / 2
             upper_lip_height = np.linalg.norm(np.array(upper_lip_center) - upper_lip_midpoint)
@@ -843,187 +896,229 @@ def analyze_lip_shape(image):
             if lip_width <= 0 or lip_height <= 0:
                 return "Unknown"
             
-            # Calculate detailed ratios and characteristics
             lip_ratio = lip_height / lip_width
             total_lip_height = upper_lip_height + lower_lip_height
             upper_lower_ratio = upper_lip_height / lower_lip_height if lower_lip_height > 0 else 1
-            
-            # Cupid's bow analysis for heart-shaped detection
             cupid_height = abs(upper_lip_cupid[1] - upper_lip_center[1])
             cupid_ratio = cupid_height / upper_lip_height if upper_lip_height > 0 else 0
-            
-            # Lip fullness analysis
             fullness_ratio = total_lip_height / lip_width
-            
-            # Comprehensive lip shape classification with detailed subtypes
-            characteristics = []
-            
-            # Basic fullness classification
-            if fullness_ratio > 0.45 or lip_ratio > 0.4:
-                base_shape = "Full"
-            elif fullness_ratio < 0.2 or lip_ratio < 0.25:
-                base_shape = "Thin"
-            else:
-                base_shape = "Medium"
-            
-            # Top-heavy vs Bottom-heavy analysis
-            if upper_lower_ratio > 1.3:
-                characteristics.append("Top-heavy")
-            elif upper_lower_ratio < 0.7:
-                characteristics.append("Bottom-heavy")
-            
-            # Heart-shaped detection (prominent cupid's bow)
+
+            # Prioritize specific subtypes
+            subtypes = []
+            if upper_lower_ratio > 1.2:
+                subtypes.append("Top-heavy")
+            elif upper_lower_ratio < 0.6:
+                subtypes.append("Bottom-heavy")
             if cupid_ratio > 0.4 and upper_lower_ratio > 1.1:
-                characteristics.append("Heart-shaped")
-            
-            # Round vs Wide analysis
+                subtypes.append("Heart-shaped")
             if lip_ratio > 0.5:
-                characteristics.append("Round")
-            elif lip_width > face_width * 0.4:  # Compare to face width
-                characteristics.append("Wide")
-            
-            # Additional shape characteristics
+                subtypes.append("Round")
+            if lip_width > w * 0.4:  # Compare to face width
+                subtypes.append("Wide")
             if lip_ratio < 0.2:
-                characteristics.append("Thin")
-            elif fullness_ratio > 0.6:
-                characteristics.append("Full")
-            
-            # Combine characteristics
-            if characteristics:
-                return f"{base_shape} ({', '.join(characteristics)})"
+                subtypes.append("Thin")
+            if fullness_ratio > 0.6:
+                subtypes.append("Full")
+
+            # If no specific subtype, fallback to Full/Thin/Medium
+            if not subtypes:
+                if fullness_ratio > 0.45 or lip_ratio > 0.4:
+                    return "Full"
+                elif fullness_ratio < 0.2 or lip_ratio < 0.25:
+                    return "Thin"
+                else:
+                    return "Medium"
             else:
-                return base_shape
-                
+                return ", ".join(subtypes)
         except (IndexError, ValueError, ZeroDivisionError) as e:
             print(f"Error in lip shape analysis: {e}")
             return "Unknown"
 
-def analyze_nose_shape(image):
-    mp_face_mesh = mp.solutions.face_mesh
-    with mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1) as face_mesh:
-        results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        if not results.multi_face_landmarks:
-            return "Unknown"
-
-        landmarks = results.multi_face_landmarks[0].landmark
-        h, w, _ = image.shape
-
-        try:
-            # Enhanced nose shape analysis using comprehensive MediaPipe landmarks
-            # Nose bridge and tip landmarks
-            nose_bridge_top = (int(landmarks[168].x * w), int(landmarks[168].y * h))     # Nose bridge top
-            nose_bridge_mid = (int(landmarks[6].x * w), int(landmarks[6].y * h))         # Nose bridge middle
-            nose_bridge_lower = (int(landmarks[197].x * w), int(landmarks[197].y * h))   # Nose bridge lower
-            nose_tip = (int(landmarks[4].x * w), int(landmarks[4].y * h))                # Nose tip
-            nose_bottom = (int(landmarks[2].x * w), int(landmarks[2].y * h))             # Nose bottom
-            
-            # Nose width landmarks (nostrils)
-            nose_left = (int(landmarks[129].x * w), int(landmarks[129].y * h))           # Left nostril
-            nose_right = (int(landmarks[358].x * w), int(landmarks[358].y * h))          # Right nostril
-            
-            # Nose base width (wider measurement)
-            nose_base_left = (int(landmarks[131].x * w), int(landmarks[131].y * h))      # Left nose base
-            nose_base_right = (int(landmarks[360].x * w), int(landmarks[360].y * h))     # Right nose base
-            
-            # Additional landmarks for detailed analysis
-            nose_bridge_left = (int(landmarks[5].x * w), int(landmarks[5].y * h))
-            nose_bridge_right = (int(landmarks[195].x * w), int(landmarks[195].y * h))
-            nose_tip_left = (int(landmarks[125].x * w), int(landmarks[125].y * h))
-            nose_tip_right = (int(landmarks[356].x * w), int(landmarks[356].y * h))
-            
-            # Calculate comprehensive nose dimensions
-            nose_length = np.linalg.norm(np.array(nose_bridge_top) - np.array(nose_bottom))
-            nose_width = np.linalg.norm(np.array(nose_left) - np.array(nose_right))
-            nose_base_width = np.linalg.norm(np.array(nose_base_left) - np.array(nose_base_right))
-            bridge_width = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_bridge_right))
-            tip_width = np.linalg.norm(np.array(nose_tip_left) - np.array(nose_tip_right))
-            
-            if nose_length <= 0 or nose_width <= 0:
-                return "Unknown"
-            
-            # Calculate detailed ratios and characteristics
-            nose_ratio = nose_length / nose_width
-            base_ratio = nose_base_width / nose_width
-            bridge_tip_ratio = bridge_width / tip_width if tip_width > 0 else 1
-            
-            # Bridge straightness analysis
-            bridge_points = [
-                np.array(nose_bridge_top),
-                np.array(nose_bridge_mid),
-                np.array(nose_bridge_lower),
-                np.array(nose_tip)
+def analyze_nose_contouring_needs(nose_shape, face_shape):
+    """Determine if nose contouring is needed and provide specific guidance"""
+    contouring_analysis = {
+        "wide": {
+            "needs_contouring": True,
+            "contouring_areas": [
+                "Along the sides of the nose bridge",
+                "Under the nose tip",
+                "Around the nostrils"
+            ],
+            "technique": "Apply contour along the sides of the nose bridge to make it appear narrower",
+            "highlight_areas": ["Down the center of the nose bridge", "Tip of the nose"],
+            "products": [
+                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+            ],
+            "steps": [
+                "Apply contour along the sides of the nose bridge",
+                "Blend thoroughly for a natural look",
+                "Apply highlight down the center of the nose",
+                "Highlight the tip of the nose",
+                "Blend everything seamlessly"
             ]
-            
-            # Calculate bridge curvature
-            bridge_curvature = 0
-            for i in range(1, len(bridge_points) - 1):
-                v1 = bridge_points[i] - bridge_points[i-1]
-                v2 = bridge_points[i+1] - bridge_points[i]
-                angle = np.arccos(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
-                bridge_curvature += angle
-            
-            # Tip angle analysis (upturned/downturned)
-            tip_angle = np.arctan2(nose_tip[1] - nose_bridge_lower[1], 
-                                 nose_tip[0] - nose_bridge_lower[0])
-            
-            # Comprehensive nose shape classification with detailed subtypes
-            characteristics = []
-            
-            # Basic size classification
-            if nose_ratio > 4.5:
-                base_shape = "Long"
-            elif nose_ratio < 2.5 or base_ratio > 1.8:
-                base_shape = "Wide"
-            elif 2.5 <= nose_ratio <= 4.5:
-                base_shape = "Medium"
-            else:
-                base_shape = "Medium"
-            
-            # Bridge shape analysis
-            if bridge_curvature < 0.1:  # Very straight bridge
-                characteristics.append("Greek (straight)")
-            elif bridge_curvature > 0.5:  # Curved bridge
-                characteristics.append("Roman (aquiline)")
-            
-            # Tip characteristics
-            if tip_angle > 0.3:  # Positive angle indicates upturned
-                characteristics.append("Turned-up")
-            elif tip_angle < -0.3:  # Negative angle indicates downturned
-                characteristics.append("Hawk")
-            
-            # Width characteristics
-            if base_ratio > 1.5:
-                characteristics.append("Nubian")
-            elif bridge_tip_ratio < 0.7:
-                characteristics.append("Button")
-            
-            # Bridge characteristics
-            if bridge_width < nose_width * 0.3:
-                characteristics.append("Flat")
-            elif bridge_width > nose_width * 0.6:
-                characteristics.append("Fleshy")
-            
-            # Crooked detection (asymmetry)
-            left_side = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_tip_left))
-            right_side = np.linalg.norm(np.array(nose_bridge_right) - np.array(nose_tip_right))
-            asymmetry = abs(left_side - right_side) / max(left_side, right_side)
-            
-            if asymmetry > 0.2:
-                characteristics.append("Crooked")
-            
-            # Snub nose detection (short and upturned)
-            if nose_ratio < 3.0 and tip_angle > 0.2:
-                characteristics.append("Snub")
-            
-            # Combine characteristics
-            if characteristics:
-                return f"{base_shape} ({', '.join(characteristics)})"
-            else:
-                return base_shape
-                
-        except (IndexError, ValueError, ZeroDivisionError) as e:
-            print(f"Error in nose shape analysis: {e}")
-            return "Unknown"
+        },
+        "long": {
+            "needs_contouring": True,
+            "contouring_areas": [
+                "Under the nose tip",
+                "Across the bridge to create breaks"
+            ],
+            "technique": "Apply contour under the nose tip to shorten the appearance",
+            "highlight_areas": ["Center of the nose bridge"],
+            "products": [
+                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+            ],
+            "steps": [
+                "Apply contour under the nose tip",
+                "Apply contour across the bridge to create visual breaks",
+                "Highlight the center of the nose bridge",
+                "Blend thoroughly for a natural look"
+            ]
+        },
+        "medium": {
+            "needs_contouring": False,
+            "contouring_areas": [],
+            "technique": "Your nose has balanced proportions. Light highlighting can enhance its natural shape.",
+            "highlight_areas": ["Center of the nose bridge", "Tip of the nose"],
+            "products": [
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"},
+                {"name": "Lakme Absolute Illuminating Highlighter", "type": "Highlight", "price": "PKR 680", "brand": "Lakme"}
+            ],
+            "steps": [
+                "Apply light highlight down the center of the nose",
+                "Highlight the tip of the nose",
+                "Blend for a subtle glow"
+            ]
+        }
+    }
+    
+    return contouring_analysis.get(nose_shape.lower(), {
+        "needs_contouring": False,
+        "contouring_areas": [],
+        "technique": "Your nose has natural proportions. Light highlighting can enhance its shape.",
+        "highlight_areas": ["Center of the nose bridge"],
+        "steps": ["Apply light highlight down the center of the nose", "Blend for a subtle glow"],
+        "products": []
+    })
+
+def analyze_face_contouring_needs(face_shape):
+    """Determine if face contouring is needed and provide specific guidance"""
+    face_contouring_analysis = {
+        "round": {
+            "needs_contouring": True,
+            "contouring_areas": [
+                "Along the jawline",
+                "Under the cheekbones",
+                "Along the hairline",
+                "Under the chin"
+            ],
+            "technique": "Create definition and angles to balance the round shape",
+            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
+            "products": [
+                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+            ],
+            "steps": [
+                "Apply contour along the jawline",
+                "Contour under the cheekbones",
+                "Apply contour along the hairline",
+                "Contour under the chin",
+                "Highlight the center of forehead, under eyes, and chin",
+                "Blend thoroughly for a natural look"
+            ]
+        },
+        "square": {
+            "needs_contouring": True,
+            "contouring_areas": [
+                "Along the jawline to soften angles",
+                "Under the cheekbones",
+                "Along the hairline"
+            ],
+            "technique": "Soften the angular features and create more curves",
+            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
+            "products": [
+                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+            ],
+            "steps": [
+                "Apply contour along the jawline to soften angles",
+                "Contour under the cheekbones",
+                "Apply contour along the hairline",
+                "Highlight the center of forehead, under eyes, and chin",
+                "Blend thoroughly for a natural look"
+            ]
+        },
+        "heart": {
+            "needs_contouring": True,
+            "contouring_areas": [
+                "Along the jawline",
+                "Under the cheekbones",
+                "Along the hairline at the temples"
+            ],
+            "technique": "Balance the wider forehead and narrower jaw",
+            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
+            "products": [
+                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+            ],
+            "steps": [
+                "Apply contour along the jawline",
+                "Contour under the cheekbones",
+                "Apply contour along the hairline at the temples",
+                "Highlight the center of forehead, under eyes, and chin",
+                "Blend thoroughly for a natural look"
+            ]
+        },
+        "oval": {
+            "needs_contouring": False,
+            "contouring_areas": [],
+            "technique": "Your face has balanced proportions. Light highlighting can enhance your natural features.",
+            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin", "Top of cheekbones"],
+            "products": [
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"},
+                {"name": "Lakme Absolute Illuminating Highlighter", "type": "Highlight", "price": "PKR 680", "brand": "Lakme"}
+            ],
+            "steps": [
+                "Apply highlight to the center of forehead",
+                "Highlight under the eyes",
+                "Apply highlight to the center of chin",
+                "Highlight the top of cheekbones",
+                "Blend for a natural glow"
+            ]
+        },
+        "diamond": {
+            "needs_contouring": True,
+            "contouring_areas": [
+                "Along the hairline",
+                "Under the cheekbones",
+                "Along the jawline"
+            ],
+            "technique": "Balance the wider cheekbones and narrower forehead/jaw",
+            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
+            "products": [
+                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
+                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
+            ],
+            "steps": [
+                "Apply contour along the hairline",
+                "Contour under the cheekbones",
+                "Apply contour along the jawline",
+                "Highlight the center of forehead, under eyes, and chin",
+                "Blend thoroughly for a natural look"
+            ]
+        }
+    }
+    
+    return face_contouring_analysis.get(face_shape.lower(), {
+        "needs_contouring": False,
+        "contouring_areas": [],
+        "technique": "Your face has natural proportions. Light highlighting can enhance your features.",
+        "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
+        "steps": ["Apply light highlight to key areas", "Blend for a subtle glow"],
+        "products": []
+    })
 
 def get_comprehensive_recommendations(skin_type, skin_tone, undertone, face_shape, eye_shape, lip_shape, nose_shape):
     # Get skincare recommendations
@@ -1336,191 +1431,109 @@ def analyze_eye_makeup_for_eye_shape(eye_shape):
         "products": []
     })
 
-def analyze_nose_contouring_needs(nose_shape, face_shape):
-    """Determine if nose contouring is needed and provide specific guidance"""
-    contouring_analysis = {
-        "wide": {
-            "needs_contouring": True,
-            "contouring_areas": [
-                "Along the sides of the nose bridge",
-                "Under the nose tip",
-                "Around the nostrils"
-            ],
-            "technique": "Apply contour along the sides of the nose bridge to make it appear narrower",
-            "highlight_areas": ["Down the center of the nose bridge", "Tip of the nose"],
-            "products": [
-                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
-            ],
-            "steps": [
-                "Apply contour along the sides of the nose bridge",
-                "Blend thoroughly for a natural look",
-                "Apply highlight down the center of the nose",
-                "Highlight the tip of the nose",
-                "Blend everything seamlessly"
-            ]
-        },
-        "long": {
-            "needs_contouring": True,
-            "contouring_areas": [
-                "Under the nose tip",
-                "Across the bridge to create breaks"
-            ],
-            "technique": "Apply contour under the nose tip to shorten the appearance",
-            "highlight_areas": ["Center of the nose bridge"],
-            "products": [
-                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
-            ],
-            "steps": [
-                "Apply contour under the nose tip",
-                "Apply contour across the bridge to create visual breaks",
-                "Highlight the center of the nose bridge",
-                "Blend thoroughly for a natural look"
-            ]
-        },
-        "medium": {
-            "needs_contouring": False,
-            "contouring_areas": [],
-            "technique": "Your nose has balanced proportions. Light highlighting can enhance its natural shape.",
-            "highlight_areas": ["Center of the nose bridge", "Tip of the nose"],
-            "products": [
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"},
-                {"name": "Lakme Absolute Illuminating Highlighter", "type": "Highlight", "price": "PKR 680", "brand": "Lakme"}
-            ],
-            "steps": [
-                "Apply light highlight down the center of the nose",
-                "Highlight the tip of the nose",
-                "Blend for a subtle glow"
-            ]
-        }
-    }
-    
-    return contouring_analysis.get(nose_shape.lower(), {
-        "needs_contouring": False,
-        "contouring_areas": [],
-        "technique": "Your nose has natural proportions. Light highlighting can enhance its shape.",
-        "highlight_areas": ["Center of the nose bridge"],
-        "steps": ["Apply light highlight down the center of the nose", "Blend for a subtle glow"],
-        "products": []
-    })
+def analyze_nose_shape(image):
+    mp_face_mesh = mp.solutions.face_mesh
+    with mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1) as face_mesh:
+        results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        if not results.multi_face_landmarks:
+            return "Unknown"
 
-def analyze_face_contouring_needs(face_shape):
-    """Determine if face contouring is needed and provide specific guidance"""
-    face_contouring_analysis = {
-        "round": {
-            "needs_contouring": True,
-            "contouring_areas": [
-                "Along the jawline",
-                "Under the cheekbones",
-                "Along the hairline",
-                "Under the chin"
-            ],
-            "technique": "Create definition and angles to balance the round shape",
-            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
-            "products": [
-                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
-            ],
-            "steps": [
-                "Apply contour along the jawline",
-                "Contour under the cheekbones",
-                "Apply contour along the hairline",
-                "Contour under the chin",
-                "Highlight the center of forehead, under eyes, and chin",
-                "Blend thoroughly for a natural look"
+        landmarks = results.multi_face_landmarks[0].landmark
+        h, w, _ = image.shape
+
+        try:
+            # Key nose landmarks
+            nose_bridge_top = (int(landmarks[168].x * w), int(landmarks[168].y * h))
+            nose_bridge_mid = (int(landmarks[6].x * w), int(landmarks[6].y * h))
+            nose_bridge_lower = (int(landmarks[197].x * w), int(landmarks[197].y * h))
+            nose_tip = (int(landmarks[4].x * w), int(landmarks[4].y * h))
+            nose_bottom = (int(landmarks[2].x * w), int(landmarks[2].y * h))
+            nose_left = (int(landmarks[129].x * w), int(landmarks[129].y * h))
+            nose_right = (int(landmarks[358].x * w), int(landmarks[358].y * h))
+            nose_bridge_left = (int(landmarks[5].x * w), int(landmarks[5].y * h))
+            nose_bridge_right = (int(landmarks[195].x * w), int(landmarks[195].y * h))
+            nose_tip_left = (int(landmarks[125].x * w), int(landmarks[125].y * h))
+            nose_tip_right = (int(landmarks[356].x * w), int(landmarks[356].y * h))
+
+            # Calculate measurements
+            nose_length = np.linalg.norm(np.array(nose_bridge_top) - np.array(nose_bottom))
+            nose_width = np.linalg.norm(np.array(nose_left) - np.array(nose_right))
+            bridge_width = np.linalg.norm(np.array(nose_bridge_left) - np.array(nose_bridge_right))
+            tip_width = np.linalg.norm(np.array(nose_tip_left) - np.array(nose_tip_right))
+
+            if nose_length <= 0 or nose_width <= 0:
+                return "Unknown"
+
+            # Calculate ratios
+            nose_ratio = nose_length / nose_width
+            bridge_tip_ratio = bridge_width / tip_width if tip_width > 0 else 1
+
+            # Bridge curvature analysis
+            bridge_points = [
+                np.array(nose_bridge_top),
+                np.array(nose_bridge_mid),
+                np.array(nose_bridge_lower),
+                np.array(nose_tip)
             ]
-        },
-        "square": {
-            "needs_contouring": True,
-            "contouring_areas": [
-                "Along the jawline to soften angles",
-                "Under the cheekbones",
-                "Along the hairline"
-            ],
-            "technique": "Soften the angular features and create more curves",
-            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
-            "products": [
-                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
-            ],
-            "steps": [
-                "Apply contour along the jawline to soften angles",
-                "Contour under the cheekbones",
-                "Apply contour along the hairline",
-                "Highlight the center of forehead, under eyes, and chin",
-                "Blend thoroughly for a natural look"
-            ]
-        },
-        "heart": {
-            "needs_contouring": True,
-            "contouring_areas": [
-                "Along the jawline",
-                "Under the cheekbones",
-                "Along the hairline at the temples"
-            ],
-            "technique": "Balance the wider forehead and narrower jaw",
-            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
-            "products": [
-                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
-            ],
-            "steps": [
-                "Apply contour along the jawline",
-                "Contour under the cheekbones",
-                "Apply contour along the hairline at the temples",
-                "Highlight the center of forehead, under eyes, and chin",
-                "Blend thoroughly for a natural look"
-            ]
-        },
-        "oval": {
-            "needs_contouring": False,
-            "contouring_areas": [],
-            "technique": "Your face has balanced proportions. Light highlighting can enhance your natural features.",
-            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin", "Top of cheekbones"],
-            "products": [
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"},
-                {"name": "Lakme Absolute Illuminating Highlighter", "type": "Highlight", "price": "PKR 680", "brand": "Lakme"}
-            ],
-            "steps": [
-                "Apply highlight to the center of forehead",
-                "Highlight under the eyes",
-                "Apply highlight to the center of chin",
-                "Highlight the top of cheekbones",
-                "Blend for a natural glow"
-            ]
-        },
-        "diamond": {
-            "needs_contouring": True,
-            "contouring_areas": [
-                "Along the hairline",
-                "Under the cheekbones",
-                "Along the jawline"
-            ],
-            "technique": "Balance the wider cheekbones and narrower forehead/jaw",
-            "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
-            "products": [
-                {"name": "Lakme Absolute Precision Contour Stick", "type": "Contour", "price": "PKR 750", "brand": "Lakme"},
-                {"name": "Maybelline Fit Me Concealer", "type": "Highlight", "price": "PKR 580", "brand": "Maybelline"}
-            ],
-            "steps": [
-                "Apply contour along the hairline",
-                "Contour under the cheekbones",
-                "Apply contour along the jawline",
-                "Highlight the center of forehead, under eyes, and chin",
-                "Blend thoroughly for a natural look"
-            ]
-        }
-    }
-    
-    return face_contouring_analysis.get(face_shape.lower(), {
-        "needs_contouring": False,
-        "contouring_areas": [],
-        "technique": "Your face has natural proportions. Light highlighting can enhance your features.",
-        "highlight_areas": ["Center of forehead", "Under eyes", "Center of chin"],
-        "steps": ["Apply light highlight to key areas", "Blend for a subtle glow"],
-        "products": []
-    })
+            
+            bridge_curvature = 0
+            for i in range(1, len(bridge_points) - 1):
+                v1 = bridge_points[i] - bridge_points[i-1]
+                v2 = bridge_points[i+1] - bridge_points[i]
+                if np.linalg.norm(v1) > 0 and np.linalg.norm(v2) > 0:
+                    cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+                    cos_angle = np.clip(cos_angle, -1, 1)  # Prevent domain error
+                    angle = np.arccos(cos_angle)
+                    bridge_curvature += angle
+
+            # Tip angle analysis
+            tip_angle = np.arctan2(nose_tip[1] - nose_bridge_lower[1], 
+                                 nose_tip[0] - nose_bridge_lower[0])
+
+            # Primary classification based on bridge shape
+            if bridge_curvature > 0.5:  # High curvature
+                primary_shape = "Roman"
+            elif bridge_curvature < 0.2:  # Low curvature
+                primary_shape = "Greek"
+            else:
+                primary_shape = "Straight"
+
+            # Secondary characteristics
+            characteristics = []
+            
+            # Tip characteristics
+            if tip_angle > 0.2:
+                characteristics.append("Upturned")
+            elif tip_angle < -0.2:
+                characteristics.append("Downturned")
+            
+            # Width characteristics
+            if bridge_tip_ratio < 0.6:
+                characteristics.append("Button")
+            elif bridge_width < nose_width * 0.25:
+                characteristics.append("Narrow")
+            elif bridge_width > nose_width * 0.5:
+                characteristics.append("Wide")
+            
+            # Length characteristics
+            if nose_ratio > 4.5:
+                characteristics.append("Long")
+            elif nose_ratio < 2.8:
+                characteristics.append("Short")
+            
+            # Special types
+            if nose_ratio < 3.0 and tip_angle > 0.15:
+                characteristics.append("Snub")
+
+            # Combine primary shape with characteristics
+            if characteristics:
+                return f"{primary_shape} ({', '.join(characteristics)})"
+            else:
+                return primary_shape
+
+        except (IndexError, ValueError, ZeroDivisionError) as e:
+            print(f"Error in nose shape analysis: {e}")
+            return "Unknown"
 
 if __name__ == '__main__':
     app.run(debug=True) 
