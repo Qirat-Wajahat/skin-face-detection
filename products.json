@@ -1,0 +1,342 @@
+{
+    "skincare": {
+        "oily": [
+            {"name": "Garnier Skin Naturals Pure Active Neem Face Wash", "link": "#", "price": "PKR 450", "brand": "Garnier"},
+            {"name": "Clean & Clear Foaming Face Wash", "link": "#", "price": "PKR 380", "brand": "Clean & Clear"},
+            {"name": "Neutrogena Oil-Free Acne Wash", "link": "#", "price": "PKR 650", "brand": "Neutrogena"},
+            {"name": "Pond's Pure White Anti-Pollution Face Wash", "link": "#", "price": "PKR 320", "brand": "Pond's"},
+            {"name": "Lakme Absolute Perfect Radiance Face Wash", "link": "#", "price": "PKR 580", "brand": "Lakme"}
+        ],
+        "dry": [
+            {"name": "CeraVe Hydrating Facial Cleanser", "link": "#", "price": "PKR 1200", "brand": "CeraVe"},
+            {"name": "Cetaphil Gentle Skin Cleanser", "link": "#", "price": "PKR 950", "brand": "Cetaphil"},
+            {"name": "Nivea Soft Moisturizing Cream", "link": "#", "price": "PKR 280", "brand": "Nivea"},
+            {"name": "Pond's Cold Cream", "link": "#", "price": "PKR 150", "brand": "Pond's"},
+            {"name": "Vaseline Petroleum Jelly", "link": "#", "price": "PKR 120", "brand": "Vaseline"}
+        ],
+        "normal": [
+            {"name": "Garnier Skin Naturals Light Complete Face Wash", "link": "#", "price": "PKR 420", "brand": "Garnier"},
+            {"name": "Pond's Bright Beauty Face Wash", "link": "#", "price": "PKR 350", "brand": "Pond's"},
+            {"name": "Clean & Clear Morning Energy Face Wash", "link": "#", "price": "PKR 400", "brand": "Clean & Clear"},
+            {"name": "Lakme Absolute Perfect Radiance Day Cream", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+            {"name": "Nivea Men Dark Spot Reduction Face Wash", "link": "#", "price": "PKR 380", "brand": "Nivea"}
+        ],
+        "combination": [
+            {"name": "Garnier Skin Naturals White Complete Face Wash", "link": "#", "price": "PKR 450", "brand": "Garnier"},
+            {"name": "Clean & Clear Deep Action Oil Control Face Wash", "link": "#", "price": "PKR 420", "brand": "Clean & Clear"},
+            {"name": "Pond's Pure White Anti-Pollution + Purity Face Wash", "link": "#", "price": "PKR 380", "brand": "Pond's"},
+            {"name": "Lakme Absolute Perfect Radiance Skin Brightening Face Pack", "link": "#", "price": "PKR 450", "brand": "Lakme"},
+            {"name": "Neutrogena Deep Clean Gentle Scrub", "link": "#", "price": "PKR 580", "brand": "Neutrogena"}
+        ],
+        "sensitive": [
+            {"name": "Cetaphil Gentle Skin Cleanser", "link": "#", "price": "PKR 950", "brand": "Cetaphil"},
+            {"name": "CeraVe Hydrating Facial Cleanser", "link": "#", "price": "PKR 1200", "brand": "CeraVe"},
+            {"name": "Simple Kind to Skin Refreshing Facial Wash", "link": "#", "price": "PKR 680", "brand": "Simple"},
+            {"name": "Nivea Sensitive Face Wash", "link": "#", "price": "PKR 420", "brand": "Nivea"},
+            {"name": "Pond's Sensitive Skin Face Wash", "link": "#", "price": "PKR 320", "brand": "Pond's"}
+        ]
+    },
+    "makeup": {
+        "foundation": {
+            "fair_cool": {"name": "Lakme Absolute Argan Oil Serum Foundation - Ivory", "link": "#", "price": "PKR 1200", "brand": "Lakme"},
+            "fair_warm": {"name": "Maybelline Fit Me Matte + Poreless - 110 Porcelain", "link": "#", "price": "PKR 850", "brand": "Maybelline"},
+            "fair_neutral": {"name": "L'Oreal Paris Infallible Pro-Matte - 101 Classic Ivory", "link": "#", "price": "PKR 950", "brand": "L'Oreal"},
+            "medium_cool": {"name": "Lakme Absolute Argan Oil Serum Foundation - Beige", "link": "#", "price": "PKR 1200", "brand": "Lakme"},
+            "medium_warm": {"name": "Maybelline Fit Me Matte + Poreless - 220 Natural Beige", "link": "#", "price": "PKR 850", "brand": "Maybelline"},
+            "medium_neutral": {"name": "L'Oreal Paris Infallible Pro-Matte - 104 Golden Beige", "link": "#", "price": "PKR 950", "brand": "L'Oreal"},
+            "deep_cool": {"name": "Lakme Absolute Argan Oil Serum Foundation - Caramel", "link": "#", "price": "PKR 1200", "brand": "Lakme"},
+            "deep_warm": {"name": "Maybelline Fit Me Matte + Poreless - 330 Toffee", "link": "#", "price": "PKR 850", "brand": "Maybelline"},
+            "deep_neutral": {"name": "L'Oreal Paris Infallible Pro-Matte - 108 Caramel Beige", "link": "#", "price": "PKR 950", "brand": "L'Oreal"}
+        },
+        "lipstick": {
+            "fair_warm": [
+                {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Pink Blush", "shade": "Warm Pink", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                {"name": "Maybelline Color Sensational Creamy Matte - Touch of Spice", "shade": "Mauve", "link": "#", "price": "PKR 750", "brand": "Maybelline"},
+                {"name": "L'Oreal Paris Color Riche - 630 Mocha Accent", "shade": "Warm Brown", "link": "#", "price": "PKR 850", "brand": "L'Oreal"}
+            ],
+            "fair_cool": [
+                {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Coral Flush", "shade": "Cool Coral", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                {"name": "Maybelline Color Sensational Creamy Matte - Divine Wine", "shade": "Cool Red", "link": "#", "price": "PKR 750", "brand": "Maybelline"},
+                {"name": "L'Oreal Paris Color Riche - 640 Rose Taffeta", "shade": "Cool Pink", "link": "#", "price": "PKR 850", "brand": "L'Oreal"}
+            ],
+            "medium_warm": [
+                {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Peach Blush", "shade": "Warm Peach", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                {"name": "Maybelline Color Sensational Creamy Matte - Nude Nuance", "shade": "Warm Nude", "link": "#", "price": "PKR 750", "brand": "Maybelline"},
+                {"name": "L'Oreal Paris Color Riche - 650 Spice", "shade": "Warm Spice", "link": "#", "price": "PKR 850", "brand": "L'Oreal"}
+            ],
+            "medium_cool": [
+                {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Berry Blush", "shade": "Cool Berry", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                {"name": "Maybelline Color Sensational Creamy Matte - Rich Ruby", "shade": "Cool Ruby", "link": "#", "price": "PKR 750", "brand": "Maybelline"},
+                {"name": "L'Oreal Paris Color Riche - 660 Plum Passion", "shade": "Cool Plum", "link": "#", "price": "PKR 850", "brand": "L'Oreal"}
+            ],
+            "deep_warm": [
+                {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Terracotta Blush", "shade": "Warm Terracotta", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                {"name": "Maybelline Color Sensational Creamy Matte - Burgundy Blush", "shade": "Warm Burgundy", "link": "#", "price": "PKR 750", "brand": "Maybelline"},
+                {"name": "L'Oreal Paris Color Riche - 670 Mahogany", "shade": "Warm Mahogany", "link": "#", "price": "PKR 850", "brand": "L'Oreal"}
+            ],
+            "deep_cool": [
+                {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Wine Blush", "shade": "Cool Wine", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                {"name": "Maybelline Color Sensational Creamy Matte - Midnight Merlot", "shade": "Cool Merlot", "link": "#", "price": "PKR 750", "brand": "Maybelline"},
+                {"name": "L'Oreal Paris Color Riche - 680 Deep Plum", "shade": "Cool Deep Plum", "link": "#", "price": "PKR 850", "brand": "L'Oreal"}
+            ]
+        },
+        "lip_shades_by_skin_tone": {
+            "fair_warm": {
+                "description": "Warm undertones with fair skin look stunning in peachy pinks, coral, and warm nudes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Peach Blush", "shade": "Peachy Pink", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Color Sensational - Touch of Spice", "shade": "Mauve", "price": "PKR 750", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Color Riche - 630 Mocha Accent", "shade": "Warm Brown", "price": "PKR 850", "brand": "L'Oreal"},
+                    {"name": "Garnier Color Naturals - Coral Crush", "shade": "Coral", "price": "PKR 580", "brand": "Garnier"}
+                ]
+            },
+            "fair_cool": {
+                "description": "Cool undertones with fair skin are enhanced by berry tones, cool pinks, and blue-based reds",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Berry Blush", "shade": "Cool Berry", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Color Sensational - Divine Wine", "shade": "Cool Red", "price": "PKR 750", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Color Riche - 640 Rose Taffeta", "shade": "Cool Pink", "price": "PKR 850", "brand": "L'Oreal"},
+                    {"name": "Garnier Color Naturals - Plum Perfect", "shade": "Plum", "price": "PKR 580", "brand": "Garnier"}
+                ]
+            },
+            "medium_warm": {
+                "description": "Medium skin with warm undertones shines in terracotta, warm reds, and golden nudes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Terracotta Blush", "shade": "Terracotta", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Color Sensational - Nude Nuance", "shade": "Warm Nude", "price": "PKR 750", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Color Riche - 650 Spice", "shade": "Warm Spice", "price": "PKR 850", "brand": "L'Oreal"},
+                    {"name": "Garnier Color Naturals - Spice Kiss", "shade": "Spice", "price": "PKR 580", "brand": "Garnier"}
+                ]
+            },
+            "medium_cool": {
+                "description": "Medium skin with cool undertones looks elegant in berry, mauve, and cool reds",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Wine Blush", "shade": "Wine", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Color Sensational - Rich Ruby", "shade": "Cool Ruby", "price": "PKR 750", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Color Riche - 660 Plum Passion", "shade": "Cool Plum", "price": "PKR 850", "brand": "L'Oreal"},
+                    {"name": "Garnier Color Naturals - Berry Bliss", "shade": "Berry", "price": "PKR 580", "brand": "Garnier"}
+                ]
+            },
+            "deep_warm": {
+                "description": "Deep skin with warm undertones is stunning in rich burgundy, warm browns, and golden tones",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Mahogany Blush", "shade": "Mahogany", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Color Sensational - Burgundy Blush", "shade": "Warm Burgundy", "price": "PKR 750", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Color Riche - 670 Mahogany", "shade": "Warm Mahogany", "price": "PKR 850", "brand": "L'Oreal"},
+                    {"name": "Garnier Color Naturals - Deep Spice", "shade": "Deep Spice", "price": "PKR 580", "brand": "Garnier"}
+                ]
+            },
+            "deep_cool": {
+                "description": "Deep skin with cool undertones looks regal in deep plum, cool burgundy, and rich berries",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Deep Plum Blush", "shade": "Deep Plum", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Color Sensational - Midnight Merlot", "shade": "Cool Merlot", "price": "PKR 750", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Color Riche - 680 Deep Plum", "shade": "Cool Deep Plum", "price": "PKR 850", "brand": "L'Oreal"},
+                    {"name": "Garnier Color Naturals - Royal Plum", "shade": "Royal Plum", "price": "PKR 580", "brand": "Garnier"}
+                ]
+            }
+        },
+        "blush_by_skin_tone": {
+            "fair_warm": {
+                "description": "Fair skin with warm undertones looks radiant with peachy and coral blushes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Peach Blush", "shade": "Peach", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Peach", "shade": "Peach", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Coral", "shade": "Coral", "price": "PKR 720", "brand": "L'Oreal"},
+                    {"name": "Garnier Skin Naturals - Peach Glow", "shade": "Peach Glow", "price": "PKR 520", "brand": "Garnier"}
+                ]
+            },
+            "fair_cool": {
+                "description": "Fair skin with cool undertones is enhanced by soft pinks and berry tones",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Pink Blush", "shade": "Soft Pink", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Rose", "shade": "Rose", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Berry", "shade": "Berry", "price": "PKR 720", "brand": "L'Oreal"},
+                    {"name": "Garnier Skin Naturals - Pink Radiance", "shade": "Pink Radiance", "price": "PKR 520", "brand": "Garnier"}
+                ]
+            },
+            "medium_warm": {
+                "description": "Medium skin with warm undertones looks stunning with terracotta and warm rose blushes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Terracotta Blush", "shade": "Terracotta", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Coral", "shade": "Coral", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Warm Pink", "shade": "Warm Pink", "price": "PKR 720", "brand": "L'Oreal"},
+                    {"name": "Garnier Skin Naturals - Terracotta Glow", "shade": "Terracotta Glow", "price": "PKR 520", "brand": "Garnier"}
+                ]
+            },
+            "medium_cool": {
+                "description": "Medium skin with cool undertones is beautiful with mauve and cool rose blushes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Berry Blush", "shade": "Berry", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Rose", "shade": "Rose", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Plum", "shade": "Plum", "price": "PKR 720", "brand": "L'Oreal"},
+                    {"name": "Garnier Skin Naturals - Berry Radiance", "shade": "Berry Radiance", "price": "PKR 520", "brand": "Garnier"}
+                ]
+            },
+            "deep_warm": {
+                "description": "Deep skin with warm undertones looks radiant with rich terracotta and warm berry blushes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Mahogany Blush", "shade": "Mahogany", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Deep Coral", "shade": "Deep Coral", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Deep Terracotta", "shade": "Deep Terracotta", "price": "PKR 720", "brand": "L'Oreal"},
+                    {"name": "Garnier Skin Naturals - Mahogany Glow", "shade": "Mahogany Glow", "price": "PKR 520", "brand": "Garnier"}
+                ]
+            },
+            "deep_cool": {
+                "description": "Deep skin with cool undertones looks elegant with deep plum and cool berry blushes",
+                "recommended_shades": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse - Deep Plum Blush", "shade": "Deep Plum", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Deep Berry", "shade": "Deep Berry", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Deep Plum", "shade": "Deep Plum", "price": "PKR 720", "brand": "L'Oreal"},
+                    {"name": "Garnier Skin Naturals - Plum Radiance", "shade": "Plum Radiance", "price": "PKR 520", "brand": "Garnier"}
+                ]
+            }
+        },
+        "blush": {
+            "round": {
+                "shades": ["Peach", "Coral", "Soft Pink"],
+                "application": "Apply on the apples of cheeks and blend upward toward temples",
+                "products": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Pink Blush", "shade": "Soft Pink", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Peach", "shade": "Peach", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Coral", "shade": "Coral", "link": "#", "price": "PKR 720", "brand": "L'Oreal"}
+                ]
+            },
+            "oval": {
+                "shades": ["Rose", "Berry", "Nude"],
+                "application": "Apply on cheekbones and blend toward hairline",
+                "products": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Berry Blush", "shade": "Berry", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Rose", "shade": "Rose", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Nude", "shade": "Nude", "link": "#", "price": "PKR 720", "brand": "L'Oreal"}
+                ]
+            },
+            "square": {
+                "shades": ["Peach", "Coral", "Warm Pink"],
+                "application": "Apply in circular motion on apples of cheeks",
+                "products": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Peach Blush", "shade": "Peach", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Coral", "shade": "Coral", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Warm Pink", "shade": "Warm Pink", "link": "#", "price": "PKR 720", "brand": "L'Oreal"}
+                ]
+            },
+            "heart": {
+                "shades": ["Pink", "Rose", "Berry"],
+                "application": "Apply on cheekbones and blend upward",
+                "products": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Pink Blush", "shade": "Pink", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Rose", "shade": "Rose", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Berry", "shade": "Berry", "link": "#", "price": "PKR 720", "brand": "L'Oreal"}
+                ]
+            },
+            "diamond": {
+                "shades": ["Rose", "Berry", "Plum"],
+                "application": "Apply on cheekbones and blend toward temples",
+                "products": [
+                    {"name": "Lakme 9 to 5 Weightless Mousse Lip & Cheek Color - Berry Blush", "shade": "Berry", "link": "#", "price": "PKR 650", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Blush - Rose", "shade": "Rose", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Blush - Plum", "shade": "Plum", "link": "#", "price": "PKR 720", "brand": "L'Oreal"}
+                ]
+            }
+        },
+        "contouring": {
+            "natural": {
+                "description": "Subtle definition for everyday wear",
+                "technique": "Apply contour 2-3 shades darker than skin tone",
+                "areas": ["Hollows of cheeks", "Jawline", "Sides of nose"],
+                "products": [
+                    {"name": "Lakme Absolute Face Stylist Blush Duos - Contour", "link": "#", "price": "PKR 850", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Bronzer - 200", "link": "#", "price": "PKR 680", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Powder - Contour", "link": "#", "price": "PKR 780", "brand": "L'Oreal"}
+                ]
+            },
+            "sculpted": {
+                "description": "Dramatic definition for special occasions",
+                "technique": "Apply contour 3-4 shades darker than skin tone",
+                "areas": ["Hollows of cheeks", "Jawline", "Sides of nose", "Temples", "Forehead"],
+                "products": [
+                    {"name": "Lakme Absolute Face Stylist Blush Duos - Deep Contour", "link": "#", "price": "PKR 850", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Bronzer - 300", "link": "#", "price": "PKR 680", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Powder - Deep Contour", "link": "#", "price": "PKR 780", "brand": "L'Oreal"}
+                ]
+            },
+            "soft": {
+                "description": "Gentle definition for a natural look",
+                "technique": "Apply contour 1-2 shades darker than skin tone",
+                "areas": ["Hollows of cheeks", "Sides of nose"],
+                "products": [
+                    {"name": "Lakme Absolute Face Stylist Blush Duos - Soft Contour", "link": "#", "price": "PKR 850", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Bronzer - 100", "link": "#", "price": "PKR 680", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Powder - Soft Contour", "link": "#", "price": "PKR 780", "brand": "L'Oreal"}
+                ]
+            }
+        },
+        "eyeliner": {
+            "almond": {
+                "styles": ["Classic winged", "Thin line", "Smudged"],
+                "technique": "Follow natural eye shape, extend wing slightly upward",
+                "products": [
+                    {"name": "Lakme Eyeconic Kajal - Black", "link": "#", "price": "PKR 450", "brand": "Lakme"},
+                    {"name": "Maybelline Eye Studio Master Precise Liquid Liner", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Super Liner - Black", "link": "#", "price": "PKR 650", "brand": "L'Oreal"}
+                ]
+            },
+            "round": {
+                "styles": ["Thick winged", "Cat eye", "Graphic"],
+                "technique": "Create elongated effect with upward wing",
+                "products": [
+                    {"name": "Lakme Eyeconic Kajal - Brown", "link": "#", "price": "PKR 450", "brand": "Lakme"},
+                    {"name": "Maybelline Eye Studio Master Graphic Liquid Liner", "link": "#", "price": "PKR 620", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Super Liner - Brown", "link": "#", "price": "PKR 650", "brand": "L'Oreal"}
+                ]
+            },
+            "hooded": {
+                "styles": ["Tightline", "Thin wing", "Smudged"],
+                "technique": "Apply liner very close to lash line, minimal wing",
+                "products": [
+                    {"name": "Lakme Eyeconic Kajal - Waterproof", "link": "#", "price": "PKR 480", "brand": "Lakme"},
+                    {"name": "Maybelline Eye Studio Master Precise Pencil Liner", "link": "#", "price": "PKR 450", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Super Liner - Waterproof", "link": "#", "price": "PKR 680", "brand": "L'Oreal"}
+                ]
+            },
+            "monolid": {
+                "styles": ["Thick line", "Gradient", "Double wing"],
+                "technique": "Apply thicker line, consider double wing technique",
+                "products": [
+                    {"name": "Lakme Eyeconic Kajal - Gel", "link": "#", "price": "PKR 520", "brand": "Lakme"},
+                    {"name": "Maybelline Eye Studio Master Graphic Liquid Liner", "link": "#", "price": "PKR 620", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris Super Liner - Gel", "link": "#", "price": "PKR 720", "brand": "L'Oreal"}
+                ]
+            }
+        },
+        "nose_contouring": {
+            "wide": {
+                "technique": "Apply contour on sides of nose, highlight down center",
+                "areas": ["Sides of nose bridge", "Tip of nose"],
+                "products": [
+                    {"name": "Lakme Absolute Face Stylist Blush Duos - Contour", "link": "#", "price": "PKR 850", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Bronzer - 200", "link": "#", "price": "PKR 680", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Powder - Contour", "link": "#", "price": "PKR 780", "brand": "L'Oreal"}
+                ]
+            },
+            "long": {
+                "technique": "Apply contour at tip and bridge, highlight at bridge",
+                "areas": ["Tip of nose", "Bridge of nose"],
+                "products": [
+                    {"name": "Lakme Absolute Face Stylist Blush Duos - Deep Contour", "link": "#", "price": "PKR 850", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Bronzer - 300", "link": "#", "price": "PKR 680", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Powder - Deep Contour", "link": "#", "price": "PKR 780", "brand": "L'Oreal"}
+                ]
+            },
+            "short": {
+                "technique": "Apply highlight down center, minimal contour",
+                "areas": ["Center of nose bridge"],
+                "products": [
+                    {"name": "Lakme Absolute Face Stylist Blush Duos - Highlight", "link": "#", "price": "PKR 850", "brand": "Lakme"},
+                    {"name": "Maybelline Fit Me Highlighter - 100", "link": "#", "price": "PKR 580", "brand": "Maybelline"},
+                    {"name": "L'Oreal Paris True Match Powder - Highlight", "link": "#", "price": "PKR 780", "brand": "L'Oreal"}
+                ]
+            }
+        }
+    }
+} 

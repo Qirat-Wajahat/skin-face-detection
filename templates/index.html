@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luxe AI Beauty Studio - Your Virtual Beauty Expert</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Audio Background -->
+    <audio id="backgroundAudio" loop>
+      <source
+        src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+        type="audio/wav"
+      />
+    </audio>
+
+    <!-- Audio Control -->
+    <div class="audio-control">
+      <button id="audioToggle" class="audio-btn">
+        <i class="fas fa-volume-up" id="audioIcon"></i>
+      </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="luxury-container">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1 class="hero-title">
+              <span class="luxury-text">Luxe</span>
+              <span class="ai-text">AI Beauty Studio</span>
+            </h1>
+            <p class="hero-subtitle">Where Technology Meets Timeless Beauty</p>
+            <p class="hero-description">
+              Experience the future of beauty with our AI-powered analysis.
+              Discover your unique features and receive personalized
+              recommendations from premium Pakistani beauty brands.
+            </p>
+          </div>
+          <div class="hero-visual">
+            <div class="beauty-illustration">
+              <i class="fas fa-sparkles"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Analysis Section -->
+      <section class="analysis-section">
+        <div class="container-fluid">
+          <div class="row g-4">
+            <!-- Camera Section -->
+            <div class="col-lg-6">
+              <div class="luxury-card camera-card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-camera-retro"></i>
+                    Face Analysis Studio
+                  </h3>
+                  <p class="card-subtitle">
+                    Position your face within the guide for optimal analysis
+                  </p>
+                </div>
+                <div class="card-body">
+                  <div class="camera-container">
+                    <video
+                      id="video"
+                      width="100%"
+                      autoplay
+                      class="camera-feed"
+                    ></video>
+                    <div class="camera-overlay">
+                      <div class="face-guide">
+                        <div class="guide-ring"></div>
+                        <div class="guide-text">Position Face Here</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="camera-controls">
+                    <button id="capture" class="luxury-btn primary-btn">
+                      <i class="fas fa-search"></i>
+                      <span>Analyze My Face</span>
+                    </button>
+                    <button id="switchCamera" class="luxury-btn secondary-btn">
+                      <i class="fas fa-sync-alt"></i>
+                      <span>Switch Camera</span>
+                    </button>
+                    <button id="debug" class="luxury-btn debug-btn">
+                      <i class="fas fa-bug"></i>
+                      <span>Debug</span>
+                    </button>
+                  </div>
+                  <canvas id="canvas" style="display: none"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="col-lg-6">
+              <div
+                id="results"
+                class="luxury-card results-card"
+                style="display: none"
+              >
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-star"></i>
+                    Your Beauty Analysis
+                  </h3>
+                  <p class="card-subtitle">
+                    Personalized insights and recommendations
+                  </p>
+                </div>
+                <div class="card-body">
+                  <!-- Navigation Tabs -->
+                  <div class="luxury-tabs">
+                    <button class="tab-btn active" data-tab="features">
+                      <i class="fas fa-user"></i>
+                      <span>Features</span>
+                    </button>
+                    <button class="tab-btn" data-tab="makeup">
+                      <i class="fas fa-palette"></i>
+                      <span>Makeup</span>
+                    </button>
+                    <button class="tab-btn" data-tab="skincare">
+                      <i class="fas fa-spa"></i>
+                      <span>Skincare</span>
+                    </button>
+                    <button class="tab-btn" data-tab="tips">
+                      <i class="fas fa-lightbulb"></i>
+                      <span>Beauty Tips</span>
+                    </button>
+                    <button class="tab-btn" data-tab="beauty-analysis">
+                      <i class="fas fa-magic"></i>
+                      <span>Detailed Analysis</span>
+                    </button>
+                  </div>
+
+                  <!-- Tab Content -->
+                  <div class="tab-content">
+                    <div id="features" class="tab-pane active">
+                      <div id="features-output"></div>
+                    </div>
+                    <div id="makeup" class="tab-pane">
+                      <div id="makeup-output"></div>
+                    </div>
+                    <div id="skincare" class="tab-pane">
+                      <div id="skincare-output"></div>
+                    </div>
+                    <div id="tips" class="tab-pane">
+                      <div id="tips-output"></div>
+                    </div>
+                    <!-- Beauty Analysis Tab -->
+                    <div id="beauty-analysis" class="tab-pane">
+                      <div class="analysis-section">
+                        <h3 class="section-title">
+                          ✨ Comprehensive Beauty Analysis
+                        </h3>
+
+                        <!-- Lip Colors Analysis -->
+                        <div class="analysis-card" id="lip-colors-analysis">
+                          <h4 class="card-title">
+                            💄 Lip Color Recommendations
+                          </h4>
+                          <div class="analysis-content">
+                            <div class="recommendation-grid">
+                              <div class="recommendation-section">
+                                <h5>Best Colors for Your Skin Tone</h5>
+                                <div
+                                  class="color-tags"
+                                  id="best-lip-colors"
+                                ></div>
+                              </div>
+                              <div class="recommendation-section">
+                                <h5>Colors to Avoid</h5>
+                                <div
+                                  class="color-tags avoid"
+                                  id="avoid-lip-colors"
+                                ></div>
+                              </div>
+                            </div>
+                            <div class="technique-section">
+                              <h5>Application Technique</h5>
+                              <p id="lip-technique"></p>
+                            </div>
+                            <div class="products-section">
+                              <h5>Recommended Products</h5>
+                              <div class="product-grid" id="lip-products"></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Blush Analysis -->
+                        <div class="analysis-card" id="blush-analysis">
+                          <h4 class="card-title">🌸 Blush Recommendations</h4>
+                          <div class="analysis-content">
+                            <div class="recommendation-grid">
+                              <div class="recommendation-section">
+                                <h5>Best Blush Shades</h5>
+                                <div
+                                  class="color-tags"
+                                  id="best-blush-shades"
+                                ></div>
+                              </div>
+                              <div class="recommendation-section">
+                                <h5>Shades to Avoid</h5>
+                                <div
+                                  class="color-tags avoid"
+                                  id="avoid-blush-shades"
+                                ></div>
+                              </div>
+                            </div>
+                            <div class="technique-section">
+                              <h5>Application Method</h5>
+                              <p id="blush-application"></p>
+                            </div>
+                            <div class="products-section">
+                              <h5>Recommended Products</h5>
+                              <div
+                                class="product-grid"
+                                id="blush-products"
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Eye Makeup Analysis -->
+                        <div class="analysis-card" id="eye-makeup-analysis">
+                          <h4 class="card-title">👁️ Eye Makeup Guide</h4>
+                          <div class="analysis-content">
+                            <div class="technique-grid">
+                              <div class="technique-item">
+                                <h5>Eyeliner Style</h5>
+                                <p id="eyeliner-style"></p>
+                              </div>
+                              <div class="technique-item">
+                                <h5>Eyeshadow Technique</h5>
+                                <p id="eyeshadow-technique"></p>
+                              </div>
+                              <div class="technique-item">
+                                <h5>Mascara Application</h5>
+                                <p id="mascara-technique"></p>
+                              </div>
+                            </div>
+                            <div class="technique-section">
+                              <h5>Step-by-Step Technique</h5>
+                              <ol id="eye-technique-steps"></ol>
+                            </div>
+                            <div class="avoid-section">
+                              <h5>What to Avoid</h5>
+                              <p id="eye-avoid"></p>
+                            </div>
+                            <div class="products-section">
+                              <h5>Recommended Products</h5>
+                              <div class="product-grid" id="eye-products"></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Nose Contouring Analysis -->
+                        <div
+                          class="analysis-card"
+                          id="nose-contouring-analysis"
+                        >
+                          <h4 class="card-title">👃 Nose Contouring Guide</h4>
+                          <div class="analysis-content">
+                            <div
+                              class="contouring-status"
+                              id="nose-contouring-status"
+                            ></div>
+                            <div
+                              class="technique-section"
+                              id="nose-technique-section"
+                            >
+                              <h5>Contouring Technique</h5>
+                              <p id="nose-technique"></p>
+                            </div>
+                            <div class="areas-section">
+                              <div class="contouring-areas">
+                                <h5>Contouring Areas</h5>
+                                <ul id="nose-contouring-areas"></ul>
+                              </div>
+                              <div class="highlighting-areas">
+                                <h5>Highlighting Areas</h5>
+                                <ul id="nose-highlight-areas"></ul>
+                              </div>
+                            </div>
+                            <div class="technique-section">
+                              <h5>Step-by-Step Process</h5>
+                              <ol id="nose-steps"></ol>
+                            </div>
+                            <div class="products-section">
+                              <h5>Recommended Products</h5>
+                              <div
+                                class="product-grid"
+                                id="nose-products"
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Face Contouring Analysis -->
+                        <div
+                          class="analysis-card"
+                          id="face-contouring-analysis"
+                        >
+                          <h4 class="card-title">✨ Face Contouring Guide</h4>
+                          <div class="analysis-content">
+                            <div
+                              class="contouring-status"
+                              id="face-contouring-status"
+                            ></div>
+                            <div
+                              class="technique-section"
+                              id="face-technique-section"
+                            >
+                              <h5>Contouring Technique</h5>
+                              <p id="face-technique"></p>
+                            </div>
+                            <div class="areas-section">
+                              <div class="contouring-areas">
+                                <h5>Contouring Areas</h5>
+                                <ul id="face-contouring-areas"></ul>
+                              </div>
+                              <div class="highlighting-areas">
+                                <h5>Highlighting Areas</h5>
+                                <ul id="face-highlight-areas"></ul>
+                              </div>
+                            </div>
+                            <div class="technique-section">
+                              <h5>Step-by-Step Process</h5>
+                              <ol id="face-steps"></ol>
+                            </div>
+                            <div class="products-section">
+                              <h5>Recommended Products</h5>
+                              <div
+                                class="product-grid"
+                                id="face-products"
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Loading State -->
+              <div
+                id="loading"
+                class="luxury-card loading-card"
+                style="display: none"
+              >
+                <div class="card-body text-center">
+                  <div class="loading-animation">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                  <h4 class="loading-title">Analyzing Your Beauty</h4>
+                  <p class="loading-text">
+                    Our AI is examining your unique features...
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
